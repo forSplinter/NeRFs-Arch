@@ -1,6 +1,6 @@
 variable "region" {
   type = string
-  default = "us-east-1"
+  default = "ap-southeast-2"
   description = "aws location"
 }
 
@@ -33,9 +33,4 @@ variable "ap_available_zone" {
   type = list(string)
   description = "value"
   
-}
-
-variable "bucket_name" {
-  type = string
-  description = "value"
 }

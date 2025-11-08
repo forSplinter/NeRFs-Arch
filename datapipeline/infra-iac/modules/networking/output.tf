@@ -8,5 +8,4 @@ output "nerfarc_public_subnet" {
 
 output "nerfarc_private_subnet" {
     value = aws_subnet.nerfarc_private_subnet.*.id
-  
 }

@@ -1,17 +1,3 @@
-variable "vpc_cidr" {
-}
-variable "vpc_name" {
-}
-variable "env" {
-}
-variable "vpc_cidr_public" {
-}
-variable "vpc_cidr_private" {
-}
-variable "availability_zone" {
-}
-
-
 #Vpc 
 resource "aws_vpc" "nerfarc_vpc" {
     cidr_block = var.vpc_cidr 
@@ -39,10 +25,10 @@ resource "aws_subnet" "nerfarc_public_subnet" {
     count = length(var.vpc_cidr_public)
     vpc_id = aws_vpc.nerfarc_vpc.id
     cidr_block = element(var.vpc_cidr_public, count.index)
-    availability_zone = element(var.availability_zone, count.index)
+    availability_zone = element(var.ap_available_zone, count.index)
     tags = {
       env = var.env 
-      Name = "${var.env}_nerfarc_public_subnet"
+      Name = "${var.env}_nerfarc_public_subnet_${count.index + 1}"
     }
   
 }
@@ -52,7 +38,7 @@ resource "aws_subnet" "nerfarc_private_subnet" {
     count = length(var.vpc_cidr_private)
     vpc_id = aws_vpc.nerfarc_vpc.id
     cidr_block = element(var.vpc_cidr_private, count.index)
-    availability_zone = element(var.availability_zone, count.index)
+    availability_zone = element(var.ap_available_zone, count.index)
     tags = {
       env = var.env 
       Name = "${var.env}_nerfarc_private_subnet_${count.index + 1}"
