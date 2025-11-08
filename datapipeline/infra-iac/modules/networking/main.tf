@@ -1,3 +1,5 @@
+#TODO: add lifecyle if i have time
+#TODO: create a Nat 
 #Vpc 
 resource "aws_vpc" "nerfarc_vpc" {
     cidr_block = var.vpc_cidr 
