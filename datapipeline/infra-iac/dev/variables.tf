@@ -36,5 +36,7 @@ variable "ap_available_zone" {
 }
 
 variable "nerfarc_dataset_bucket" {
+  type = string
+  description = "value"
   
 }
