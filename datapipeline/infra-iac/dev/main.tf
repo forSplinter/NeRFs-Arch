@@ -7,3 +7,9 @@ module "networking" {
     env = var.env
     vpc_name = var.vpc_name
 }
+
+module "storage" {
+  source = "../modules/storage"
+  nerfarc_dataset_bucket = var.nerfarc_dataset_bucket
+  env = var.env
+}
