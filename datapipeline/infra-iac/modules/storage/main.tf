@@ -19,7 +19,7 @@ resource "aws_s3_object" "nerfarc_s3_bucket_upload" {
     ]) 
     bucket = aws_s3_bucket.nerfarc_s3_bucket_default.id
     key = each.value
-    server_side_encryption = "AE256"
+    server_side_encryption = "AES256"
     tags = {
       Name = "${var.env}_${var.nerfarc_dataset_bucket}"
       env = var.env
