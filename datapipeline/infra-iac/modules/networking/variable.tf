@@ -1,14 +1,3 @@
-variable "region" {
-  type = string
-  default = "us-east-1"
-  description = "aws location"
-}
-
-variable "env" {
-    type = string
-    description = "value"
-}
-
 variable "vpc_name" {
   type = string
   description = "value"
@@ -33,9 +22,4 @@ variable "ap_available_zone" {
   type = list(string)
   description = "value"
   
-}
-
-variable "bucket_name" {
-  type = string
-  description = "value"
 }
