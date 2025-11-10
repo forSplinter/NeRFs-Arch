@@ -1,0 +1,12 @@
+[project]
+name = "nerfs-arch"
+version = "0.1.0"
+description = "DeepLearning project for COMP4471, NeRF-based archaeological artifact reconstruction"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ipykernel>=7.1.0",
+    "matplotlib>=3.10.7",
+    "numpy>=2.3.4",
+    "torch>=2.9.0",
+]
