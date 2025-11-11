@@ -40,3 +40,8 @@ variable "nerfarc_dataset_bucket" {
   description = "value"
   
 }
+
+variable "nerfarc_api_gtw_name" {
+  type = string
+  description = "value"
+}
