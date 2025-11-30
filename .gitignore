@@ -229,3 +229,5 @@ terraform.rc
 *.tmp
 .cache/
 
+# This is temporary ignore for the .terraform directory
+/datapipeline 
