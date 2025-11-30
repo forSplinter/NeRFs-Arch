@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 from utils.rmbg import BackgroundRemoval
 from utils.imgprocessed import ImageProcessor
-from utils.filesUtils import copy_files
+from utils.files_utils import copy_files
 
 class Preprocessor:
     def __init__(self, dataset_root: str, max_workers=None):
