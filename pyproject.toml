@@ -1,12 +1,45 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "nerfs-arch"
-version = "0.1.0"
+version = "1.0.0"
 description = "DeepLearning project for COMP4471, NeRF-based archaeological artifact reconstruction"
-readme = "README.md"
-requires-python = ">=3.13"
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [
+    {name = "Mathys Muganga", email = "rmmuganga@connect.ust.hk"},
+    {name = "Aurelien Jouvenceau", email = "apgj@connect.ust.hk"},
+    {name = "Xinwei Lin", email="elinae@connect.ust.hk"},
+]
+keywords = ["NeRF", "3D Reconstruction", "Computer Vision", "Deep Learning", "Archaeology"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+license = {text = "MIT"}
+requires-python = ">=3.11"
 dependencies = [
     "ipykernel>=7.1.0",
     "matplotlib>=3.10.7",
     "numpy>=2.3.4",
     "torch>=2.9.0",
+]
+[tool.setuptools.packages.find]
+include = ["ci_cd*", "config*", "dataset*", "model*", "evaluation*", "pipeline*"]
+exclude = ["tests*", "docs*", "reports*", "notebooks*"]
+
+[tool.setuptools]
+packages = ["ci_cd", "config", "dataset", "model", "evaluation", "pipeline"]
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.9.1",
+    "flake8>=6.1.0",
+    "isort>=5.12.0",
+    "mypy>=1.3.0",
+    "pre-commit>=3.4.0",
+    "pytest>=7.4.0",
 ]
