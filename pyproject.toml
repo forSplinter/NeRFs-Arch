@@ -41,7 +41,7 @@ dependencies = [
 ]
 [tool.setuptools.packages.find]
 where = ["." ]
-include = ["ci_cd*", "config*", "dataset*", "model*", "evaluation*", "pipeline*", "utils*"]
+include = ["ci_cd*", "config*", "dataset*", "model*", "evaluation*", "pipeline*", "utils*", "scripts*"]
 exclude = ["tests*", "docs*", "reports*", "notebooks*"]
 
 [project.optional-dependencies]
@@ -57,3 +57,5 @@ dev = [
 [project.scripts]
 preprocess = "dataset.preprocessing:main"
 colmap-manager = "dataset.colmap_manager:main"
+colmap-manager-cloud = "dataset.colmap_manager_cloud:main"
+colmap2nerf = "scripts.colmap2nerf_custom:main"

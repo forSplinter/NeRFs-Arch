@@ -2,7 +2,50 @@ import os
 import shutil 
 import json 
 from pathlib import Path 
+import struct
+import numpy as np
+from collections import namedtuple
 
+Camera = namedtuple("Camera", ["id", "model", "width", "height", "params"])
+Image = namedtuple("Image", ["id", "qvec", "tvec", "camera_id", "name", "xys", "point3D_ids"])
+
+def read_cameras_binary(path_to_model_file):
+    cameras = {}
+    with open(path_to_model_file, "rb") as fid:
+        num_cameras = struct.unpack("Q", fid.read(8))[0]
+        for _ in range(num_cameras):
+            camera_id = struct.unpack("I", fid.read(4))[0]
+            model_id = struct.unpack("i", fid.read(4))[0]
+            width = struct.unpack("Q", fid.read(8))[0]
+            height = struct.unpack("Q", fid.read(8))[0]
+            num_params = struct.unpack("Q", fid.read(8))[0]
+            params = struct.unpack("d" * num_params, fid.read(8 * num_params))
+            cameras[camera_id] = Camera(id=camera_id, model=model_id, width=width, height=height, params=params)
+    return cameras
+
+def read_images_binary(path_to_model_file):
+    images = {}
+    with open(path_to_model_file, "rb") as fid:
+        num_reg_images = struct.unpack("Q", fid.read(8))[0]
+        for _ in range(num_reg_images):
+            image_id = struct.unpack("I", fid.read(4))[0]
+            qvec = struct.unpack("dddd", fid.read(32))
+            tvec = struct.unpack("ddd", fid.read(24))
+            camera_id = struct.unpack("I", fid.read(4))[0]
+            image_name = ""
+            current_char = struct.unpack("c", fid.read(1))[0]
+            while current_char != b"\x00":
+                image_name += current_char.decode("utf-8")
+                current_char = struct.unpack("c", fid.read(1))[0]
+            num_points2D = struct.unpack("Q", fid.read(8))[0]
+            xys = struct.unpack("d" * 2 * num_points2D, fid.read(16 * num_points2D))
+            point3D_ids = struct.unpack("i" * num_points2D, fid.read(4 * num_points2D))
+            images[image_id] = Image(
+                id=image_id, qvec=np.array(qvec), tvec=np.array(tvec),
+                camera_id=camera_id, name=image_name,
+                xys=np.array(xys).reshape(-1, 2), point3D_ids=np.array(point3D_ids)
+            )
+    return images
 class ColmapUtils:
     def __init__(self, dataset_root: str):
         self.dataset_root = dataset_root
