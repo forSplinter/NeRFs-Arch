@@ -1,26 +1,14 @@
 import os 
 import shutil
 import subprocess
-import platform 
 from utils.colmap_utils import ColmapUtils
 
 class ColmapProcess:
     def __init__(self, dataset_root: str):
-        """_summary_
-
-        Args:
-            dataset_root (str): _description_
-        """
         self.dataset_root = dataset_root
         self.utils = ColmapUtils(dataset_root=dataset_root)
     
-    def run_colmap(self, lot_name: str, size: int):
-        """_summary_
-
-        Args:
-            lot_name (str): _description_
-            size (int): _description_
-        """
+    def run_colmap_local(self, lot_name: str, size: int):
         if not self.utils.copy_mask(lot_name, size):
             return False
         
@@ -53,6 +41,7 @@ class ColmapProcess:
                 --workspace_path "{os.path.join(colmap_base, "dense")}"\
                 --output_path "{os.path.join(colmap_base, "dense", "fused.ply")}"'
         ]
+        
         for i, cmd in enumerate(commands):
             try:
                 result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
@@ -66,14 +55,14 @@ class ColmapProcess:
         self._organize_output(lot_name, size)
         print(f"COLMAP processing completed for {lot_name} at {size}px")
         return True
-    
-    def _organize_output(self, lot_name: str, size: int):
-        """_summary_
 
-        Args:
-            lot_name (str): _description_
-            size (int): _description_
-        """
+    def prepare_cloud_data(self, lot_name: str, size: int):
+        if not self.utils.copy_mask(lot_name, size):
+            return False
+        colmap_base = os.path.join(self.utils.colmap_dir, lot_name, f"{size}px")
+        return colmap_base
+
+    def _organize_output(self, lot_name: str, size: int):
         colmap_base = os.path.join(self.utils.colmap_dir, lot_name, f"{size}px")
         output_dir = os.path.join(colmap_base, "output")
 
