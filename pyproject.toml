@@ -31,9 +31,6 @@ dependencies = [
 include = ["ci_cd*", "config*", "dataset*", "model*", "evaluation*", "pipeline*"]
 exclude = ["tests*", "docs*", "reports*", "notebooks*"]
 
-[tool.setuptools]
-packages = ["ci_cd", "config", "dataset", "model", "evaluation", "pipeline"]
-
 [project.optional-dependencies]
 dev = [
     "black>=23.9.1",
