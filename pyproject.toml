@@ -54,3 +54,4 @@ dev = [
 ]
 [project.scripts]
 preprocess = "dataset.preprocessing:main"
+colmap-manager = "dataset.colmap_manager:main"
