@@ -234,3 +234,4 @@ datapipeline/
 raw/
 processed/
 colmap/
+dataset/
