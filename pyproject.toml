@@ -56,6 +56,4 @@ dev = [
 ]
 [project.scripts]
 preprocess = "dataset.preprocessing:main"
-colmap-exe = "dataset.colmap_manager:main"
-colmap-manager-cloud = "dataset.colmap_manager_cloud:main"
-colmap2nerf = "scripts.colmap2nerf_custom:main"
+colmap2nerf = "scripts.colmaprunner:main"

@@ -1,6 +1,6 @@
 import argparse
-from utils.colmap_utils import ColmapUtils
-from utils.colmap_process import ColmapProcess
+from utils.colmap.colmap_utils import ColmapUtils
+from utils.colmap.colmap_pipeline import ColmapProcess
 
 class ColmapManager:
     def __init__(self, dataset_root: str):
