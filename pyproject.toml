@@ -41,7 +41,7 @@ dependencies = [
 ]
 [tool.setuptools.packages.find]
 where = ["." ]
-include = ["ci_cd*", "config*", "dataset*", "model*", "evaluation*", "pipeline*", "utils*", "scripts*"]
+include = ["config*", "dataset*", "model*", "evaluation*","utils*", "scripts*"]
 exclude = ["tests*", "docs*", "reports*", "notebooks*"]
 
 [project.optional-dependencies]
@@ -55,5 +55,5 @@ dev = [
     "vastai>=0.2.8",
 ]
 [project.scripts]
-preprocess = "dataset.preprocessing:main"
+preprocess = "scripts.preprocessing:main"
 colmap2nerf = "scripts.colmaprunner:main"

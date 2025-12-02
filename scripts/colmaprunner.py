@@ -5,6 +5,8 @@ from utils.colmap.colmap_pipeline import ColmapProcess
 from utils.colmap.colmap2nerf import ColmapToNeRFConverter
 
 def main():
+    """_summary_
+    """
     parser = argparse.ArgumentParser(description="COLMAP2NeRF Manager")
     
     parser.add_argument("--list", action="store_true", help="List available projects")
@@ -17,7 +19,7 @@ def main():
     parser.add_argument("--text_path", help="Path to COLMAP .txt files")
     parser.add_argument("--images_path", help="Path to images")
     parser.add_argument("--out", default="transforms.json", help="Output file")
-    parser.add_argument("--aabb_scale", type=int, default=16, help="AABB scale factor")
+    parser.add_argument("--aabb_scale", type=int, default=16, help="AABB scale factor") #TODO: make sure this is working properly
     parser.add_argument("--dataset_root", default="dataset", help="Dataset root directory")
     args = parser.parse_args()
     
