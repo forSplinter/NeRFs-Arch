@@ -1,0 +1,31 @@
+vast:
+  machine_id: "25522320"
+  image: "nerfs-arch/colmap:latest"
+  disk_size: 120
+  gpu_count: 1
+  ondemand: true
+  ssh: true
+
+colmap:
+  feature_extraction:
+    gpu_index: 0
+    max_image_size: 2048
+    sift_gpu_max_num_features: 8192
+  
+  feature_matching:
+    gpu_index: 0
+    method: "exhaustive"
+    
+  mapper:
+    ba_global_use_gpu: true
+    ba_global_gpu_index: 0
+    
+  dense:
+    geom_consistency: true
+    gpu_index: 0
+    max_image_size: 2000
+
+paths:
+  input: "/workspace/input"
+  output: "/workspace/output"
+  models: "/workspace/output/models"
