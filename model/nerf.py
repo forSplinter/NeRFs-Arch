@@ -1,94 +1,78 @@
 from torch import nn
+import torch
 import torch.nn.functional as F
 
-class DensityNerf(nn.Module):
+class NeRF(nn.Module):
     """
-    1st Stage Basic Nerf Model (MLP): 
-    approximate the density of a point in the scene based on its position
+    Basic NeRF Model (MLP): 
+    Approximate the density and color of a point in the scene based on its position and ray direction.
 
     Architecture : 
-    (linear - relu)*hidden_size => (linear,linear)
-
+    1st Stage : position => (linear - relu)*hidden_density_size => (linear: density,linear: density features)
+    2nd Stage : density features + ray direction => (linear - relu)*hidden_color_size => linear: color
+    
     Args:
-    - N : (int) paramater for positional encoding dimensionnality
-    - hidden_size : (int[]) list representing the number of hidden layers and their size
-    - out_feature_size : (int) : size of output features vector
+    - hidden_density_size : (int[]) Number of hidden layers for 1st Stage and sizes
+    - hidden_color_size : (int[]) Number of hidden layers for 2nd Stage and sizes
+    - N_pos : (int) paramater for positional encoding dimensionnality
+    - N_dir : (int) paramater for viewing direction encoding dimensionnality
+    - feature_density_size : (int) : dimension of output density features vector
     
     Returns:
-    - density : (int) approximated density of the point
-    - feature_vector : (float[]) vector to be used for 2nd stage Nerf to approximate color
-
+    - density : (float) approximated density of the point
+    - color: (R,G,B) int tuple of approximated color of the point
     """
-    def __init__(self, hidden_size, N, out_feature_size):
-        super(DensityNerf, self).__init__()
+    def __init__(self, hidden_density_size=[256]*8, hidden_color_size=[128], N_pos=10, N_dir=4, feature_density_size=256):
+        super(NeRF, self).__init__()
         
-        # Input Layer
-        self.linear_input = nn.Linear(6*N, hidden_size[0])
+        # Input Layers
+        self.input_density = nn.Linear(6*N_pos, hidden_density_size[0])
+        self.input_color = nn.Linear(6*N_dir + feature_density_size, hidden_color_size[0])
 
         # Hidden Layers
-        self.linears = nn.ModuleList()
-        for i in range(len(hidden_size)- 1):
-            self.linears.append(nn.Linear(hidden_size[i], hidden_size[i+1]))
+        self.density_stage = nn.ModuleList()
+        for i in range(1,len(hidden_density_size)):
+            self.density_stage.append(nn.Linear(hidden_density_size[i-1], hidden_density_size[i]))
 
+        if len(hidden_color_size) > 1:
+            self.color_stage = nn.ModuleList()
+            for i in range(1,len(hidden_color_size)):
+                self.color_stage.append(nn.Linear(hidden_color_size[i-1], hidden_color_size[i]))
+        
         # Output Layers
-        self.linear_density = nn.Linear(hidden_size[-1],1)
-        self.linear_features = nn.Linear(hidden_size[-1], out_feature_size)
+        self.output_density = nn.Linear(hidden_density_size[-1],1)
+        self.output_features = nn.Linear(hidden_density_size[-1], feature_density_size)
+        self.output_color = nn.Linear(hidden_color_size[-1],3)
 
-    def forward(self, x):
-        density, feature_vector = None, None
+    def forward(self, x, y):
+        """
+        x : sample point position encoded
+        y : ray direction encoded
+        """
+        if x.shape[0] != y.shape[0]:
+            raise AssertionError("Number of point shoud be equal to number of direction vector")
+
+        density, feature_vector, color = None, None, None
         
-        x = self.linear_input(x)
+        # Input Density
+        x = self.input_density(x)
         x = F.relu(x)
 
-        for l in self.linears :
+        for l in self.density_stage :
             x = l(x)
             x = F.relu(x)
 
-        density = self.linear_density(x)
-        feature_vector = self.linear_features(x)
+        density = self.output_density(x)
+        feature_vector = self.output_features(x)
 
-        return density, feature_vector
-    
-class ColorNerf(nn.Module):
-    """
-    2nd Stage Basic Nerf Model (MLP): 
-    approximate the color of a point in the scene based on density feature vector and viewing direction
+        y = self.input_color(torch.cat([feature_vector, y], dim=-1))
+        y = F.relu(y)
 
-    Architecture : 
-    (linear - relu)*hidden_size => linear
-    Args:
-    - N : (int) paramater for positional encoding dimensionnality
-    - hidden_size : (int[]) list representing the number of hidden layers and their size
-    - out_feature_size : (int) : size of output features vector
-    
-    Returns:
-    - color : (int) approximated color of the point
-
-    """
-    def __init__(self, hidden_size, N, out_feature_size):
-        super(ColorNerf, self).__init__()
+        if hasattr(self, 'color_stage') and len(self.color_stage) > 0:
+            for l in self.color_stage:
+                y = l(y)
+                y = F.relu(y)
         
-        # Input Layer
-        self.linear_input = nn.Linear(6*N + out_feature_size, hidden_size[0])
+        color = self.output_color(y)
 
-        # Hidden Layers
-        self.linears = nn.ModuleList()
-        for i in range(len(hidden_size)- 1):
-            self.linears.append(nn.Linear(hidden_size[i], hidden_size[i+1]))
-
-        # Output Layer
-        self.linear_color = nn.Linear(hidden_size[-1],1)
-
-    def forward(self, x):
-        color = None
-        
-        x = self.linear_input(x)
-        x = F.relu(x)
-
-        for l in self.linears :
-            x = l(x)
-            x = F.relu(x)
-
-        color = self.linear_color(x)
-
-        return color
+        return density, color
