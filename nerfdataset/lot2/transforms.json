@@ -15,7 +15,7 @@
   "aabb_scale": 16,
   "frames": [
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0555.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0555.png",
       "transform_matrix": [
         [
           0.9721794423282552,
@@ -44,7 +44,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0556.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0556.png",
       "transform_matrix": [
         [
           0.9312889287260654,
@@ -73,7 +73,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0557.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0557.png",
       "transform_matrix": [
         [
           0.8432472099296664,
@@ -102,7 +102,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0558.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0558.png",
       "transform_matrix": [
         [
           0.7312892498999118,
@@ -131,7 +131,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0559.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0559.png",
       "transform_matrix": [
         [
           0.6091572091948221,
@@ -160,7 +160,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0560.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0560.png",
       "transform_matrix": [
         [
           0.49483769331348215,
@@ -189,7 +189,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0561.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0561.png",
       "transform_matrix": [
         [
           0.34933533032970193,
@@ -218,7 +218,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0562.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0562.png",
       "transform_matrix": [
         [
           0.20425766087348865,
@@ -247,7 +247,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0563.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0563.png",
       "transform_matrix": [
         [
           0.06726684228892632,
@@ -276,7 +276,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0564.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0564.png",
       "transform_matrix": [
         [
           -0.07607938544130902,
@@ -305,7 +305,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0565.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0565.png",
       "transform_matrix": [
         [
           -0.2071923361264404,
@@ -334,7 +334,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0566.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0566.png",
       "transform_matrix": [
         [
           -0.32130875935738457,
@@ -363,7 +363,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0567.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0567.png",
       "transform_matrix": [
         [
           -0.47032756897219913,
@@ -392,7 +392,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0568.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0568.png",
       "transform_matrix": [
         [
           -0.5981866480018603,
@@ -421,7 +421,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0569.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0569.png",
       "transform_matrix": [
         [
           -0.6646990677884462,
@@ -450,7 +450,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0570.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0570.png",
       "transform_matrix": [
         [
           -0.7716268275850962,
@@ -479,7 +479,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0571.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0571.png",
       "transform_matrix": [
         [
           -0.8571609012487353,
@@ -508,7 +508,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0572.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0572.png",
       "transform_matrix": [
         [
           -0.947475052039703,
@@ -537,7 +537,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0573.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0573.png",
       "transform_matrix": [
         [
           -0.9851411929414373,
@@ -566,7 +566,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0574.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0574.png",
       "transform_matrix": [
         [
           -0.9892645960853303,
@@ -595,7 +595,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0575.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0575.png",
       "transform_matrix": [
         [
           -0.966994885656413,
@@ -624,7 +624,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0576.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0576.png",
       "transform_matrix": [
         [
           -0.9182861460472888,
@@ -653,7 +653,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0577.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0577.png",
       "transform_matrix": [
         [
           -0.861746681131587,
@@ -682,7 +682,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0578.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0578.png",
       "transform_matrix": [
         [
           -0.8253562014910552,
@@ -711,7 +711,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0579.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0579.png",
       "transform_matrix": [
         [
           -0.8101599348730206,
@@ -740,7 +740,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0580.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0580.png",
       "transform_matrix": [
         [
           -0.7833331169416281,
@@ -769,7 +769,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0581.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0581.png",
       "transform_matrix": [
         [
           -0.7747113468080162,
@@ -798,7 +798,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0582.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0582.png",
       "transform_matrix": [
         [
           -0.759074960633759,
@@ -827,7 +827,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0583.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0583.png",
       "transform_matrix": [
         [
           -0.7346186676552142,
@@ -856,7 +856,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0584.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0584.png",
       "transform_matrix": [
         [
           -0.7204493692854199,
@@ -885,7 +885,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0585.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0585.png",
       "transform_matrix": [
         [
           -0.6897006481315084,
@@ -914,7 +914,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0586.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0586.png",
       "transform_matrix": [
         [
           0.8161355224835142,
@@ -943,7 +943,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0587.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0587.png",
       "transform_matrix": [
         [
           0.7210953929104428,
@@ -972,7 +972,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0588.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0588.png",
       "transform_matrix": [
         [
           0.624313295198054,
@@ -1001,7 +1001,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0589.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0589.png",
       "transform_matrix": [
         [
           0.5586211061214955,
@@ -1030,7 +1030,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0590.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0590.png",
       "transform_matrix": [
         [
           0.4392025563126227,
@@ -1059,7 +1059,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0591.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0591.png",
       "transform_matrix": [
         [
           0.2593185963550015,
@@ -1088,7 +1088,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0592.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0592.png",
       "transform_matrix": [
         [
           0.042770310600854636,
@@ -1117,7 +1117,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0593.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0593.png",
       "transform_matrix": [
         [
           -0.030265305444344304,
@@ -1146,7 +1146,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0594.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0594.png",
       "transform_matrix": [
         [
           -0.16531941294060692,
@@ -1175,7 +1175,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0595.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0595.png",
       "transform_matrix": [
         [
           -0.3829500795801102,
@@ -1204,7 +1204,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0596.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0596.png",
       "transform_matrix": [
         [
           -0.38584540818455365,
@@ -1233,7 +1233,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0597.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0597.png",
       "transform_matrix": [
         [
           -0.5777688171415941,
@@ -1262,7 +1262,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0598.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0598.png",
       "transform_matrix": [
         [
           -0.68414912381792,
@@ -1291,7 +1291,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0599.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0599.png",
       "transform_matrix": [
         [
           -0.7486221471670641,
@@ -1320,7 +1320,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0600.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0600.png",
       "transform_matrix": [
         [
           -0.8753839306430564,
@@ -1349,7 +1349,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0601.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0601.png",
       "transform_matrix": [
         [
           -0.9525956169408398,
@@ -1378,7 +1378,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0602.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0602.png",
       "transform_matrix": [
         [
           -0.987995910103008,
@@ -1407,7 +1407,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0603.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0603.png",
       "transform_matrix": [
         [
           -0.9726869967457015,
@@ -1436,7 +1436,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0604.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0604.png",
       "transform_matrix": [
         [
           -0.9067107906010416,
@@ -1465,7 +1465,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0605.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0605.png",
       "transform_matrix": [
         [
           -0.8638314593160753,
@@ -1494,7 +1494,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0606.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0606.png",
       "transform_matrix": [
         [
           -0.7693104607865981,
@@ -1523,7 +1523,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0607.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0607.png",
       "transform_matrix": [
         [
           -0.6965136498489461,
@@ -1552,7 +1552,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0608.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0608.png",
       "transform_matrix": [
         [
           0.8078628929055467,
@@ -1581,7 +1581,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0609.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0609.png",
       "transform_matrix": [
         [
           0.6761368730036902,
@@ -1610,7 +1610,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0610.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0610.png",
       "transform_matrix": [
         [
           0.576382782731807,
@@ -1639,7 +1639,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0611.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0611.png",
       "transform_matrix": [
         [
           0.4437197135816065,
@@ -1668,7 +1668,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0612.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0612.png",
       "transform_matrix": [
         [
           0.2963122310595906,
@@ -1697,7 +1697,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0630.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0630.png",
       "transform_matrix": [
         [
           0.8987911916739908,
@@ -1726,7 +1726,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0631.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0631.png",
       "transform_matrix": [
         [
           0.7668117955527105,
@@ -1755,7 +1755,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0632.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0632.png",
       "transform_matrix": [
         [
           0.606221664074299,
@@ -1784,7 +1784,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0633.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0633.png",
       "transform_matrix": [
         [
           0.43247524220298084,
@@ -1813,7 +1813,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0634.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0634.png",
       "transform_matrix": [
         [
           0.21077998264723236,
@@ -1842,7 +1842,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0635.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0635.png",
       "transform_matrix": [
         [
           0.0012800581180481413,
@@ -1871,7 +1871,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0636.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0636.png",
       "transform_matrix": [
         [
           -0.18614047045243248,
@@ -1900,7 +1900,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0637.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0637.png",
       "transform_matrix": [
         [
           -0.37953089826271846,
@@ -1929,7 +1929,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0638.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0638.png",
       "transform_matrix": [
         [
           -0.5603989908118509,
@@ -1958,7 +1958,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0639.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0639.png",
       "transform_matrix": [
         [
           -0.7097671211265176,
@@ -1987,7 +1987,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0640.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0640.png",
       "transform_matrix": [
         [
           -0.8385778340653631,
@@ -2016,7 +2016,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0641.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0641.png",
       "transform_matrix": [
         [
           -0.938916859084845,
@@ -2045,7 +2045,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0642.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0642.png",
       "transform_matrix": [
         [
           -0.9898129947491303,
@@ -2074,7 +2074,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0643.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0643.png",
       "transform_matrix": [
         [
           -0.978781621333768,
@@ -2103,7 +2103,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0644.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0644.png",
       "transform_matrix": [
         [
           -0.8987133470509419,
@@ -2132,7 +2132,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0645.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0645.png",
       "transform_matrix": [
         [
           -0.8669222291411636,
@@ -2161,7 +2161,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0646.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0646.png",
       "transform_matrix": [
         [
           -0.744927637952772,
@@ -2190,7 +2190,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0647.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0647.png",
       "transform_matrix": [
         [
           -0.7061119689554719,
@@ -2219,7 +2219,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0649.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0649.png",
       "transform_matrix": [
         [
           0.8655809787509091,
@@ -2248,7 +2248,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0650.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0650.png",
       "transform_matrix": [
         [
           0.6982943066132486,
@@ -2277,7 +2277,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0651.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0651.png",
       "transform_matrix": [
         [
           0.4548817590365213,
@@ -2306,7 +2306,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0652.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0652.png",
       "transform_matrix": [
         [
           0.4360353261504617,
@@ -2335,7 +2335,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0653.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0653.png",
       "transform_matrix": [
         [
           0.3294613368403412,
@@ -2364,7 +2364,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0654.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0654.png",
       "transform_matrix": [
         [
           0.07892169802807732,
@@ -2393,7 +2393,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0655.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0655.png",
       "transform_matrix": [
         [
           -0.17342261879599383,
@@ -2422,7 +2422,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0656.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0656.png",
       "transform_matrix": [
         [
           -0.3695756950039751,
@@ -2451,7 +2451,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0657.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0657.png",
       "transform_matrix": [
         [
           -0.5214426422020765,
@@ -2480,7 +2480,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0658.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0658.png",
       "transform_matrix": [
         [
           -0.6862577038406908,
@@ -2509,7 +2509,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0659.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0659.png",
       "transform_matrix": [
         [
           -0.809531832551885,
@@ -2538,7 +2538,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0660.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0660.png",
       "transform_matrix": [
         [
           -0.9299705191679734,
@@ -2567,7 +2567,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0661.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0661.png",
       "transform_matrix": [
         [
           -0.9839265468336196,
@@ -2596,7 +2596,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0662.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0662.png",
       "transform_matrix": [
         [
           -0.9869282217445523,
@@ -2625,7 +2625,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0663.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0663.png",
       "transform_matrix": [
         [
           -0.9318489441677713,
@@ -2654,7 +2654,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0664.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0664.png",
       "transform_matrix": [
         [
           -0.8203883470419081,
@@ -2683,7 +2683,7 @@
       ]
     },
     {
-      "file_path": "./dataset/colmap/lot2/1365px/images/IMG_0665.png",
+      "file_path": "./nerfdataset/lot2/images/IMG_0665.png",
       "transform_matrix": [
         [
           -0.6738032815176273,
