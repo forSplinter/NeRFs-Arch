@@ -8,16 +8,21 @@ from typing import Dict, List, Tuple, Optional
 
 from utils.colmap.colmap_utils import read_cameras_binary, read_images_binary
 
-# Définition locale pour éviter les conflits d'import
 Camera = namedtuple("Camera", ["id", "model", "width", "height", "params"])
 Image = namedtuple("Image", ["id", "qvec", "tvec", "camera_id", "name", "xys", "point3D_ids"])
 
 class ColmapToNeRFConverter:
-    """Convertisseur COLMAP vers format NeRF"""
     
     @staticmethod
     def read_cameras_text(path: str) -> Dict[int, Camera]:
-        """Lecture des caméras depuis fichier texte COLMAP"""
+        """_summary_
+
+        Args:
+            path (str): _description_
+
+        Returns:
+            Dict[int, Camera]: _description_
+        """
         cameras = {}
         with open(os.path.join(path, "cameras.txt"), "r") as f:
             for line in f:
@@ -34,7 +39,14 @@ class ColmapToNeRFConverter:
     
     @staticmethod
     def read_images_text(path: str) -> Dict[int, Image]:
-        """Lecture des images depuis fichier texte COLMAP"""
+        """_summary_
+
+        Args:
+            path (str): _description_
+
+        Returns:
+            Dict[int, Image]: _description_
+        """
         images = {}
         with open(os.path.join(path, "images.txt"), "r") as f:
             lines = f.readlines()
@@ -52,7 +64,14 @@ class ColmapToNeRFConverter:
     
     @staticmethod
     def _qvec_to_rotation_matrix(qvec: np.ndarray) -> np.ndarray:
-        """Conversion quaternion vers matrice de rotation"""
+        """_summary_
+
+        Args:
+            qvec (np.ndarray): _description_
+
+        Returns:
+            np.ndarray: _description_
+        """
         return np.array([
             [
                 1 - 2 * qvec[2]**2 - 2 * qvec[3]**2,
@@ -70,7 +89,15 @@ class ColmapToNeRFConverter:
         ])
     @staticmethod
     def _rotation_matrix_align_vectors(a: np.ndarray, b: np.ndarray) -> np.ndarray:
-        """Matrice de rotation alignant le vecteur a sur b"""
+        """_summary_
+
+        Args:
+            a (np.ndarray): _description_
+            b (np.ndarray): _description_
+
+        Returns:
+            np.ndarray: _description_
+        """
         a, b = a / np.linalg.norm(a), b / np.linalg.norm(b)
         v = np.cross(a, b)
         c = np.dot(a, b)
@@ -85,7 +112,17 @@ class ColmapToNeRFConverter:
     @staticmethod
     def _closest_point_between_lines(origin_a: np.ndarray, direction_a: np.ndarray,
                                      origin_b: np.ndarray, direction_b: np.ndarray) -> Tuple[np.ndarray, float]:
-        """Point le plus proche entre deux lignes"""
+        """_summary_
+
+        Args:
+            origin_a (np.ndarray): _description_
+            direction_a (np.ndarray): _description_
+            origin_b (np.ndarray): _description_
+            direction_b (np.ndarray): _description_
+
+        Returns:
+            Tuple[np.ndarray, float]: _description_
+        """
         direction_a = direction_a / np.linalg.norm(direction_a)
         direction_b = direction_b / np.linalg.norm(direction_b)
         cross_product = np.cross(direction_a, direction_b)
@@ -101,7 +138,14 @@ class ColmapToNeRFConverter:
     
     @staticmethod
     def _extract_camera_parameters(camera) -> Tuple:
-        """Extraction des paramètres caméra depuis modèle COLMAP"""
+        """_summary_
+
+        Args:
+            camera (_type_): _description_
+
+        Returns:
+            Tuple: _description_
+        """
         width = float(camera.width)
         height = float(camera.height)
         
@@ -130,7 +174,17 @@ class ColmapToNeRFConverter:
     @staticmethod
     def _calculate_field_of_view(focal_x: float, focal_y: float, 
                                  width: float, height: float) -> Tuple[float, float]:
-        """Calcul du champ de vision à partir de la focale et résolution"""
+        """_summary_
+
+        Args:
+            focal_x (float): _description_
+            focal_y (float): _description_
+            width (float): _description_
+            height (float): _description_
+
+        Returns:
+            Tuple[float, float]: _description_
+        """
         angle_x = math.atan(width / (focal_x * 2)) * 2
         angle_y = math.atan(height / (focal_y * 2)) * 2
         return angle_x, angle_y
@@ -138,7 +192,17 @@ class ColmapToNeRFConverter:
     @staticmethod
     def _process_image_frame(image: Image, images_directory: str, 
                             up_vector: np.ndarray, preserve_colmap_coordinates: bool) -> Tuple[Dict, np.ndarray]:
-        """Traitement d'une image unique"""
+        """_summary_
+
+        Args:
+            image (Image): _description_
+            images_directory (str): _description_
+            up_vector (np.ndarray): _description_
+            preserve_colmap_coordinates (bool): _description_
+
+        Returns:
+            Tuple[Dict, np.ndarray]: _description_
+        """
         image_relative_path = os.path.relpath(os.path.join(images_directory, image.name))
         
         rotation_matrix = ColmapToNeRFConverter._qvec_to_rotation_matrix(image.qvec)
@@ -162,7 +226,15 @@ class ColmapToNeRFConverter:
     
     @staticmethod
     def _normalize_coordinate_frames(frames: List[Dict], preserve_colmap_coordinates: bool) -> List[Dict]:
-        """Normalisation des systèmes de coordonnées et centrage de la scène"""
+        """_summary_
+
+        Args:
+            frames (List[Dict]): _description_
+            preserve_colmap_coordinates (bool): _description_
+
+        Returns:
+            List[Dict]: _description_
+        """
         if preserve_colmap_coordinates:
             flip_transform = np.array([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
             for frame in frames:
@@ -199,7 +271,6 @@ class ColmapToNeRFConverter:
         if total_weight > 0.0:
             center_point /= total_weight
         
-        # Centrage et mise à l'échelle
         for frame in frames:
             frame["transform_matrix"][0:3, 3] -= center_point
         
@@ -213,8 +284,14 @@ class ColmapToNeRFConverter:
     
     @staticmethod
     def _convert_image_type(image):
-        """Convertit une image de n'importe quel format vers le format local"""
-        # Si c'est déjà le bon type
+        """_summary_
+
+        Args:
+            image (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if hasattr(image, 'qvec') and hasattr(image, 'tvec'):
             return Image(
                 id=getattr(image, 'id', 0),
@@ -235,9 +312,24 @@ class ColmapToNeRFConverter:
                 aabb_scale: int = 16,
                 skip_initial_images: int = 0,
                 preserve_colmap_coordinates: bool = False) -> bool:
-        """Conversion principale COLMAP vers format NeRF"""
+        """_summary_
+
+        Args:
+            colmap_binary_path (Optional[str], optional): _description_. Defaults to None.
+            colmap_text_path (Optional[str], optional): _description_. Defaults to None.
+            images_directory (Optional[str], optional): _description_. Defaults to None.
+            output_file (str, optional): _description_. Defaults to "transforms.json".
+            aabb_scale (int, optional): _description_. Defaults to 16.
+            skip_initial_images (int, optional): _description_. Defaults to 0.
+            preserve_colmap_coordinates (bool, optional): _description_. Defaults to False.
+
+        Raises:
+            ValueError: _description_
+
+        Returns:
+            bool: _description_
+        """
         
-        # Lecture des données COLMAP
         if colmap_text_path:
             cameras = ColmapToNeRFConverter.read_cameras_text(colmap_text_path)
             images = ColmapToNeRFConverter.read_images_text(colmap_text_path)
@@ -250,7 +342,6 @@ class ColmapToNeRFConverter:
         if not cameras:
             return False
         
-        # Extraction paramètres caméra
         camera = list(cameras.values())[0]
         (width, height, focal_x, focal_y, center_x, center_y,
          distortion_k1, distortion_k2, distortion_p1, distortion_p2) = ColmapToNeRFConverter._extract_camera_parameters(camera)
@@ -277,7 +368,6 @@ class ColmapToNeRFConverter:
             if index < skip_initial_images:
                 continue
             
-            # Conversion du type d'image si nécessaire
             converted_image = ColmapToNeRFConverter._convert_image_type(image)
             
             frame, up_vector = ColmapToNeRFConverter._process_image_frame(
@@ -285,18 +375,15 @@ class ColmapToNeRFConverter:
             )
             processed_frames.append(frame)
         
-        # Normalisation des coordonnées
         processed_frames = ColmapToNeRFConverter._normalize_coordinate_frames(
             processed_frames, preserve_colmap_coordinates
         )
         
-        # Conversion des arrays numpy en listes
         for frame in processed_frames:
             frame["transform_matrix"] = frame["transform_matrix"].tolist()
         
         output_structure["frames"] = processed_frames
         
-        # Écriture du fichier de sortie
         os.makedirs(os.path.dirname(output_file) if os.path.dirname(output_file) else ".", exist_ok=True)
         with open(output_file, "w") as file:
             json.dump(output_structure, file, indent=2)
