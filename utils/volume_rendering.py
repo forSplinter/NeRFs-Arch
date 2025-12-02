@@ -47,6 +47,7 @@ def sample_rays(dataset, ray_batch_size):
     
     return batch_rayons: dict(origins, directions, colors, image_index), dict of rays computed
     """
+
     batch_rayons = {
         "origins": [],
         "directions": [],
