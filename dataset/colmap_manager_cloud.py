@@ -6,35 +6,46 @@ def main():
     lot_name = os.getenv('LOT_NAME', 'lot1')
     size = int(os.getenv('SIZE', '1365'))
     
-    print(f"Starting COLMAP cloud pipeline for {lot_name} {size}px")
+    print(f"[COLMAP] Starting for lot: {lot_name}, size: {size}")
     
-    from utils.colmap_utils import ColmapUtils
-    from utils.colmap_process import ColmapProcess
+    dataset_root = '/workspace/dataset'
+    colmap_base = f"{dataset_root}/colmap/{lot_name}/{size}px"
+    database_path = f"{colmap_base}/database.db"
+    input_images = f"{colmap_base}/images"
     
-    utils = ColmapUtils('/workspace/dataset')
-    processor = ColmapProcess('/workspace/dataset')
+    print(f"[COLMAP] Base directory: {colmap_base}")
+    print(f"[COLMAP] Images directory: {input_images}")
     
-    colmap_base = utils.setup_colmap(lot_name, size)
-    
-    input_images = f"/workspace/dataset/colmap/{lot_name}/{size}px/images"
     if not os.path.exists(input_images):
-        print(f"Error: Input images not found at {input_images}")
+        print(f"[ERROR] Images directory does not exist: {input_images}")
         return False
+    
+    images_count = len([f for f in os.listdir(input_images) if f.lower().endswith(('.jpg', '.png', '.jpeg'))])
+    print(f"[COLMAP] Found {images_count} images")
+    
+    if images_count == 0:
+        print(f"[ERROR] No images found in {input_images}")
+        return False
+    
+    # Créer les dossiers nécessaires
+    os.makedirs(f"{colmap_base}/dense", exist_ok=True)
+    os.makedirs(f"{colmap_base}/sparse", exist_ok=True)
     
     commands = [
         f'colmap feature_extractor \
-            --database_path "{colmap_base}/database.db" \
+            --database_path "{database_path}" \
             --image_path "{input_images}" \
+            --ImageReader.single_camera 1 \
             --SiftExtraction.use_gpu 1 \
             --SiftExtraction.gpu_index 0',
             
         f'colmap exhaustive_matcher \
-            --database_path "{colmap_base}/database.db" \
+            --database_path "{database_path}" \
             --SiftMatching.use_gpu 1 \
             --SiftMatching.gpu_index 0',
             
         f'colmap mapper \
-            --database_path "{colmap_base}/database.db" \
+            --database_path "{database_path}" \
             --image_path "{input_images}" \
             --output_path "{colmap_base}/sparse" \
             --Mapper.ba_global_use_gpu 1',
@@ -54,15 +65,43 @@ def main():
             --output_path "{colmap_base}/dense/fused.ply"'
     ]
     
-    for i, cmd in enumerate(commands, 1):
-        print(f"Running COLMAP step {i}/6")
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        if result.returncode != 0:
-            print(f"Command failed: {result.stderr}")
-            return False
+    step_names = [
+        "feature_extractor",
+        "exhaustive_matcher",
+        "mapper",
+        "image_undistorter",
+        "patch_match_stereo",
+        "stereo_fusion"
+    ]
     
-    print(f"COLMAP cloud pipeline completed for {lot_name} at {size}px")
+    for i, (step, cmd) in enumerate(zip(step_names, commands)):
+        print(f"\n[COLMAP] Step {i+1}/6: {step}")
+        print(f"[COLMAP] Command: {cmd.split()[0]}")
+        
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            print(f"[ERROR] Step {step} failed")
+            print(f"[ERROR] Return code: {result.returncode}")
+            print(f"[ERROR] Stderr: {result.stderr[:500]}")  # Limité à 500 caractères
+            return False
+        
+        print(f"[COLMAP] {step} completed")
+    
+    # Vérifier si le résultat final existe
+    final_ply = f"{colmap_base}/dense/fused.ply"
+    if os.path.exists(final_ply):
+        print(f"\n[COLMAP] Success! Point cloud created: {final_ply}")
+        print(f"[COLMAP] File size: {os.path.getsize(final_ply)} bytes")
+    else:
+        print(f"\n[WARNING] Final PLY file not found: {final_ply}")
+    
     return True
 
 if __name__ == "__main__":
-    main()
+    success = main()
+    if success:
+        print("\n[COLMAP] ✓ Pipeline completed successfully")
+    else:
+        print("\n[COLMAP] ✗ Pipeline failed")
+    sys.exit(0 if success else 1)
