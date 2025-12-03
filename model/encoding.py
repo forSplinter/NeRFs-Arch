@@ -74,7 +74,7 @@ class IntegratedPositionalEncoding(nn.Module):
             log_sampling (bool, optional): _description_. Defaults to True.
             trainable (bool, optional): _description_. Defaults to False.
         """
-        sdf
+        
         super().__init__()
         self.L = L
         self.num_freqs = num_freqs
