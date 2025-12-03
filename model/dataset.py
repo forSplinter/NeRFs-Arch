@@ -2,7 +2,6 @@ import os
 import math
 import numpy as np
 import torch
-import json
 from typing import Optional, List, Tuple, Dict
 import torch.utils.data
 from model.camera.dataset_loader import DatasetLoader
@@ -10,18 +9,24 @@ import imageio.v3 as iio
 
 
 class BaseNeRFDataset(torch.utils.data.Dataset):
-    def __init__(
-        self,
-        json_path: str,
-        data_root: Optional[str] = None,
-        cam_id: bool = False,
-        split: str = "train",
-    ):
+    def __init__(self, json_path: str, data_root: Optional[str] = None, cam_id: bool = False, split: str = "train", device: str = "cpu", dtype: torch.dtype = torch.float32):
+        """_summary_
+
+        Args:
+            json_path (str): _description_
+            data_root (Optional[str], optional): _description_. Defaults to None.
+            cam_id (bool, optional): _description_. Defaults to False.
+            split (str, optional): _description_. Defaults to "train".
+            device (str, optional): _description_. Defaults to "cpu".
+            dtype (torch.dtype, optional): _description_. Defaults to torch.float32.
+        """
         super().__init__()
 
+        self.device = device
+        self.dtype = dtype
         self.dataset_loader = DatasetLoader(json_path)
-        self.cameras = self.dataset_loader.frames
-        self.intrinsics = self.dataset_loader.intrinsics
+        self.cameras = self.dataset_loader.frames  
+        self.intrinsics = self.dataset_loader.intrinsics  
 
         self.image_count = len(self.cameras)
         self.H = self.intrinsics.h
@@ -122,20 +127,10 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
 
 
 class RayNeRFDataset(BaseNeRFDataset):
-    def __init__(
-        self,
-        json_path: str,
-        data_root: Optional[str] = None,
-        cam_id: bool = False,
-        split: str = "train",
-        device: str = "cpu",
-        dtype: torch.dtype = torch.float32,
-    ):
+    def __init__(self,json_path: str,data_root: Optional[str] = None,cam_id: bool = False,split: str = "train",device: str = "cpu",dtype: torch.dtype = torch.float32,):
         super().__init__(json_path, data_root, cam_id, split)
-
         self.device = device
         self.dtype = dtype
-
         self._precompute_rays()
 
     def _precompute_rays(self):
@@ -161,10 +156,10 @@ class RayNeRFDataset(BaseNeRFDataset):
 
         self.all_rays = torch.stack([self.rays_o, self.rays_d], dim=1)
 
-    def get_rays(self, idx: int):
+    def get_rays(self, idx: int)-> Tuple[torch.Tensor, torch.Tensor]:
         return self.rays_o[idx], self.rays_d[idx]
 
-    def __getitem__(self, idx: int):
+    def __getitem__(self, idx: int)-> dict:
         if self.split == "train":
             img_idx = idx // (self.H * self.W)
             pix_idx = idx % (self.H * self.W)
@@ -201,7 +196,7 @@ class RayNeRFDataset(BaseNeRFDataset):
 
             return sample
 
-    def get_full_batch(self, batch_size: int):
+    def get_full_batch(self, batch_size: int)-> dict:
         indices = torch.randint(0, len(self), (batch_size,))
         batch = [self[int(i.item())] for i in indices]
 
@@ -223,13 +218,7 @@ class RayNeRFDataset(BaseNeRFDataset):
         return result
 
 
-def create_nerf_datasets(
-    json_path: str,
-    train_data_root: Optional[str] = None,
-    val_data_root: Optional[str] = None,
-    cam_id: bool = False,
-    device: str = "cpu",
-):
+def create_nerf_datasets(json_path: str, train_data_root: Optional[str] = None, val_data_root: Optional[str] = None,cam_id: bool = False,device: str = "cpu")-> Tuple[RayNeRFDataset, RayNeRFDataset]:
     train_dataset = RayNeRFDataset(
         json_path=json_path,
         data_root=train_data_root,
