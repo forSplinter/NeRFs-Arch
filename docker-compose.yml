@@ -1,0 +1,27 @@
+services:
+  colmap-vast:
+    build:
+      context: .
+      dockerfile: Dockerfile.colmap
+    image: nerfs-arch/colmap:vast
+    container_name: colmap-vast-${LOT_NAME:-lot1}-${SIZE:-1365}
+    environment:
+      - LOT_NAME=${LOT_NAME:-lot1}
+      - SIZE=${SIZE:-1365}
+      - WORKSPACE=/workspace
+      - PYTHONPATH=/workspace:/workspace/utils
+    working_dir: /workspace
+    command: >
+      sh -c "
+        echo 'Starting COLMAP reconstruction...' &&
+        uv run python dataset/colmap_manager_cloud.py
+      "
+    volumes:
+      - ./dataset:/workspace/dataset:rw
+      - ./utils:/workspace/utils:ro
+    networks:
+      - vast-network
+
+networks:
+  vast-network:
+    driver: bridge
