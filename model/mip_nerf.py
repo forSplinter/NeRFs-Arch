@@ -4,9 +4,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from typing import Optional, Dict, Tuple
-from models.mlp import MipMLP
-from utils.rendering import MipVolumeRenderer
-from utils.sampling import StratifiedSampler, HierarchicalSampler
+from utils.nerfmlp import MipMLP
+from utils.volumerendering import MipVolumeRenderer
+from utils.sampler import StratifiedSampler, HierarchicalSampler
 
 
 class MipNeRF(nn.Module):
@@ -184,7 +184,13 @@ class MipNeRF(nn.Module):
         t1 = z_vals[..., 1:]   
         
         # Expand radii to match samples
-        radii = radii[..., None].expand(t0.shape)  
+        if radii.shape == t0.shape:
+            radii =  radii[..., None].expand(t0.shape)
+        
+        else:
+            repeat_factor = t0.shape[0]//radii.shape[0]
+            radii = radii[..., None].expand(-1, repeat_factor).reshape(t0.shape)
+            print(f" MipNeRF: Fixed radii shape {radii.shape[0]} -> {t0.shape[0]}")
         
         if ray_shape == 'cone':
             means, covs = self.conical_frustum_to_gaussian(
@@ -236,7 +242,8 @@ class MipNeRF(nn.Module):
             **kwargs
         )
         # Hierarchical sampling
-        if self.use_hierarchical and self.nerf_fine is not None:
+                # Hierarchical sampling
+        if self.use_hierarchical and self.nerf_fine is not None and self.sampler_fine is not None:
             # Blur weights for stability
             weights = outputs_coarse['weights']
             weights_pad = torch.cat([

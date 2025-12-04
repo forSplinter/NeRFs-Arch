@@ -1,328 +1,228 @@
+# utils/evaluation.py
+
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
-from typing import Dict, Optional, List, Tuple
+import math
+from typing import Dict, Optional, List
 from pathlib import Path
 from tqdm import tqdm
 import json
-import time
-from utils.metrics import Metrics, img2mse, mse2psnr
+
+from utils.metrics import Metrics
 from utils.export import Exporter
 from utils.camera.camera import Camera
 
 
 class Eval:
-    def __init__( self, model: nn.Module, dataset: torch.utils.data.Dataset, device: str = 'cuda',output_dir: Optional[str] = None):
-        """_summary_
-
-        Args:
-            model (nn.Module): _description_
-            dataset (torch.utils.data.Dataset): _description_
-            device (str, optional): _description_. Defaults to 'cuda'.
-            output_dir (Optional[str], optional): _description_. Defaults to None.
-        """
+    """
+    Evaluateur optimisé pour NeRF
+    """
+    
+    def __init__(self, model: nn.Module, dataset, device: str = 'cuda', output_dir: Optional[str] = None):
         self.model = model
         self.dataset = dataset
         self.device = device
+        self.model.eval() 
         
         self.output_dir = Path(output_dir) if output_dir else Path('eval_results')
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        # Initialize your metrics and exporter
         self.metrics = Metrics(device=device)
         self.exporter = Exporter()
         
-        # Results storage
         self.results = {
             'per_image': [],
             'aggregate': {}
         }
     
     @torch.no_grad()
-    def evaluate_single_image(self, rays_o: torch.Tensor, rays_d: torch.Tensor, bounds: torch.Tensor, radii: torch.Tensor, target_rgb: torch.Tensor,H: int, W: int,**kwargs) -> Dict:
-        """_summary_
-
-        Args:
-            rays_o (torch.Tensor): _description_
-            rays_d (torch.Tensor): _description_
-            bounds (torch.Tensor): _description_
-            radii (torch.Tensor): _description_
-            target_rgb (torch.Tensor): _description_
-            H (int): _description_
-            W (int): _description_
-
-        Returns:
-            Dict: _description_
+    def evaluate_single(self, idx: int, **render_kwargs) -> Dict:
         """
-        self.model.eval()
+        Évaluer une seule image
+        """
+        data = self.dataset[idx]
         
-        # Render image
-        outputs = self.model(rays_o, rays_d, bounds, radii, **kwargs)
-        
-        # Get RGB output (fine if available, else coarse)
-        if 'rgb' in outputs:
-            pred_rgb = outputs['rgb']
+        rays = data['rays']
+        if rays.shape[0] == 2:
+            rays_o, rays_d = rays[0].to(self.device), rays[1].to(self.device)
         else:
-            pred_rgb = outputs.get('rgb0', outputs['rgb'])
+            rays_o, rays_d = rays[:, 0].to(self.device), rays[:, 1].to(self.device)
         
-        # Reshape to image
+        H, W = self.dataset.H, self.dataset.W
+        near, far = self.dataset.near, self.dataset.far
+        
+        num_rays = rays_o.shape[0]
+        bounds = torch.tensor([[near, far]], device=self.device).expand(num_rays, 2)
+        radii = torch.full((num_rays,), 2.0 / self.dataset.focal_x, device=self.device)
+        
+        outputs = self.model(rays_o, rays_d, bounds, radii, **render_kwargs)
+        pred_rgb = outputs.get('rgb_fine', outputs.get('rgb_coarse'))
+        if pred_rgb is None:
+            pred_rgb = outputs.get('rgb', outputs.get('rgb0'))
+        
         pred_rgb = pred_rgb.reshape(H, W, 3)
-        target_rgb = target_rgb.reshape(H, W, 3)
         
-        # Compute all metrics using your Metrics class
-        metrics_dict = self.metrics.compute_all(pred_rgb, target_rgb, format='HWC')
-        
-        # Convert tensor values to float
-        metrics_dict = {k: v.item() if isinstance(v, torch.Tensor) else v 
-                       for k, v in metrics_dict.items()}
+        target_rgb = data.get('target_s', None)
+        if target_rgb is not None:
+            if len(target_rgb.shape) == 3:  # (H, W, 3)
+                target_flat = target_rgb.reshape(-1, 3)
+                target_rgb_reshaped = target_rgb
+            else:  
+                target_flat = target_rgb
+                target_rgb_reshaped = target_rgb.reshape(H, W, 3)
+            
+            metrics_dict = self.metrics.compute_all(pred_rgb, target_rgb_reshaped, format='HWC')
+            metrics_dict = {k: v.item() if isinstance(v, torch.Tensor) else v 
+                           for k, v in metrics_dict.items()}
+        else:
+            metrics_dict = {}
+            target_flat = None
+            target_rgb_reshaped = None
         
         return {
             'pred_rgb': pred_rgb,
-            'target_rgb': target_rgb,
+            'target_rgb': target_rgb_reshaped,
             'metrics': metrics_dict,
             'depth': outputs.get('depth', None),
             'acc': outputs.get('acc', None)
         }
     
     @torch.no_grad()
-    def evaluate_dataset( self, save_images: bool = True, save_comparison: bool = True, verbose: bool = True,**render_kwargs) -> Dict:
+    def evaluate_all(self, 
+                    max_images: Optional[int] = None,
+                    save_every: int = 5,
+                    **render_kwargs) -> Dict:
         """
-        Evaluate entire dataset
+        Évaluer toutes les images du dataset
         
         Args:
-            save_images: Save rendered images using Exporter
-            save_comparison: Save side-by-side comparisons
-            verbose: Print progress
-            render_kwargs: Additional rendering arguments
-            
+            max_images: Maximum d'images à évaluer (None = toutes)
+            save_every: Sauvegarder une image toutes les N images
+            render_kwargs: Arguments pour le rendu
+        
         Returns:
-            Dictionary with aggregate metrics
+            Métriques agrégées
         """
         self.model.eval()
         
-        all_metrics = {
-            'mse': [],
-            'psnr': [],
-            'ssim': [],
-            'lpips': []
-        }
+        total_images = len(self.dataset)
+        if max_images is not None:
+            total_images = min(total_images, max_images)
         
-        rendered_images = []
-        target_images = []
+        print(f"\n🔍 Évaluation de {total_images} images...")
         
-        if verbose:
-            print(f"\n{'='*80}")
-            print(f"Evaluating {len(self.dataset)} images")
-            print(f"{'='*80}\n")
+        all_metrics = {'psnr': [], 'ssim': [], 'lpips': []}
         
-        pbar = tqdm(range(len(self.dataset)), desc="Evaluating") if verbose else range(len(self.dataset))
-        
-        for idx in pbar:
-            # Get data from your RayNeRFDataset
-            data = self.dataset[idx]
+        for idx in tqdm(range(total_images), desc="Images"):
+            result = self.evaluate_single(idx, **render_kwargs)
             
-            rays = data['rays']  # (2, H*W, 3) or (H*W, 2, 3)
-            target_rgb = data['target_s']  # (H*W, 3)
+            if save_every > 0 and idx % save_every == 0 and result['pred_rgb'] is not None:
+                img_path = self.output_dir / f'pred_{idx:04d}.png'
+                self.exporter.save_image(result['pred_rgb'], img_path)
+                
+                if result['target_rgb'] is not None:
+                    target_path = self.output_dir / f'target_{idx:04d}.png'
+                    self.exporter.save_image(result['target_rgb'], target_path)
             
-            # Extract rays_o and rays_d
-            if rays.shape[0] == 2:
-                rays_o, rays_d = rays[0], rays[1]
-            else:
-                rays_o, rays_d = rays[:, 0], rays[:, 1]
+            if result['metrics']:
+                for key in all_metrics:
+                    if key in result['metrics']:
+                        all_metrics[key].append(result['metrics'][key])
             
-            # Get dimensions
-            H, W = self.dataset.height_width()
-            
-            # Get bounds
-            near, far = self.dataset.near_far()
-            bounds = torch.tensor(
-                [[near, far]], device=self.device
-            ).expand(rays_o.shape[0], 2)
-            
-            # Get radii (pixel size)
-            radii = torch.full((rays_o.shape[0],), self.dataset.radii(), device=self.device)
-            
-            # Evaluate
-            result = self.evaluate_single_image(
-                rays_o, rays_d, bounds, radii, target_rgb, H, W, **render_kwargs
-            )
-            
-            # Store metrics
-            for key in all_metrics:
-                all_metrics[key].append(result['metrics'][key])
-            
-            # Store per-image result
             self.results['per_image'].append({
                 'index': idx,
                 'metrics': result['metrics']
             })
-            
-            rendered_images.append(result['pred_rgb'])
-            target_images.append(result['target_rgb'])
-            
-            if verbose:
-                pbar.set_postfix({
-                    'PSNR': f"{result['metrics']['psnr']:.2f}",
-                    'SSIM': f"{result['metrics']['ssim']:.4f}"
-                })
         
-        if save_images:
-            img_dir = self.output_dir / 'rendered'
-            print(f"\nSaving rendered images to {img_dir}...")
-            self.exporter.save_images(
-                rendered_images,
-                output_dir=img_dir,
-                prefix='pred',
-                verbose=False
-            )
-            
-            if save_comparison:
-                target_dir = self.output_dir / 'ground_truth'
-                print(f"Saving ground truth images to {target_dir}...")
-                self.exporter.save_images(
-                    target_images,
-                    output_dir=target_dir,
-                    prefix='target',
-                    verbose=False
-                )
-                
-                comp_dir = self.output_dir / 'comparisons'
-                comp_dir.mkdir(exist_ok=True)
-                print(f"Saving comparison images to {comp_dir}...")
-                for i, (pred, target) in enumerate(zip(rendered_images, target_images)):
-                    self._save_comparison(pred, target, comp_dir / f'comp_{i:04d}.png')
-
-        aggregate_metrics = {}
-        for key in all_metrics:
-            values = torch.tensor(all_metrics[key])
-            aggregate_metrics[key] = {
-                'mean': values.mean().item(),
-                'std': values.std().item(),
-                'min': values.min().item(),
-                'max': values.max().item()
-            }
+        aggregate = {}
+        for key, values in all_metrics.items():
+            if values:
+                values_tensor = torch.tensor(values)
+                aggregate[key] = {
+                    'mean': values_tensor.mean().item(),
+                    'std': values_tensor.std().item(),
+                    'min': values_tensor.min().item(),
+                    'max': values_tensor.max().item()
+                }
         
-        self.results['aggregate'] = aggregate_metrics
+        self.results['aggregate'] = aggregate
         
-        # Save results
         self._save_results()
         
-        if verbose:
-            self._print_summary()
+        if aggregate:
+            self._print_summary(aggregate)
         
-        return aggregate_metrics
-    
-    def _save_comparison( self, pred: torch.Tensor, target: torch.Tensor,path: Path):
-        import matplotlib.pyplot as plt
-        
-        pred_np = pred.cpu().numpy()
-        target_np = target.cpu().numpy()
-        error = torch.abs(pred - target).cpu().numpy()
-        
-        fig, axes = plt.subplots(1, 3, figsize=(15, 5))
-        
-        axes[0].imshow(pred_np)
-        axes[0].set_title('Predicted')
-        axes[0].axis('off')
-        
-        axes[1].imshow(target_np)
-        axes[1].set_title('Ground Truth')
-        axes[1].axis('off')
-        
-        im = axes[2].imshow(error, cmap='hot', vmin=0, vmax=0.5)
-        axes[2].set_title('Error')
-        axes[2].axis('off')
-        plt.colorbar(im, ax=axes[2])
-        
-        plt.tight_layout()
-        plt.savefig(path, dpi=150, bbox_inches='tight')
-        plt.close()
+        return aggregate
     
     def _save_results(self):
-        """Save evaluation results to JSON"""
-        results_path = self.output_dir / 'results.json'
+        """Sauvegarder résultats en JSON"""
+        def convert(obj):
+            if isinstance(obj, torch.Tensor):
+                return obj.cpu().tolist() if obj.numel() > 1 else obj.cpu().item()
+            elif isinstance(obj, dict):
+                return {k: convert(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert(item) for item in obj]
+            else:
+                return obj
         
-        with open(results_path, 'w') as f:
-            json.dump(self.results, f, indent=2)
+        json_path = self.output_dir / 'results.json'
+        with open(json_path, 'w') as f:
+            json.dump(convert(self.results), f, indent=2)
         
-        print(f"\nResults saved to {results_path}")
+        print (f"Result saved: {json_path}")
     
-    def _print_summary(self):
-        """Print evaluation summary"""
-        print(f"\n{'='*80}")
-        print("EVALUATION SUMMARY")
-        print(f"{'='*80}\n")
+    def _print_summary(self, aggregate: Dict):
+        print(f"\n{'='*50}")
+        print("Results")
         
-        agg = self.results['aggregate']
+        if 'psnr' in aggregate:
+            psnr = aggregate['psnr']
+            print(f"PSNR: {psnr['mean']:.2f} ± {psnr['std']:.2f} dB")
+            print(f"     [min: {psnr['min']:.2f}, max: {psnr['max']:.2f}]")
         
-        print(f"{'Metric':<10} {'Mean':<12} {'Std':<12} {'Min':<12} {'Max':<12}")
-        print(f"{'-'*80}")
+        if 'ssim' in aggregate:
+            ssim = aggregate['ssim']
+            print(f"SSIM: {ssim['mean']:.4f} ± {ssim['std']:.4f}")
+            print(f"     [min: {ssim['min']:.4f}, max: {ssim['max']:.4f}]")
         
-        print(f"{'PSNR (dB)':<10} "
-              f"{agg['psnr']['mean']:>10.2f}  "
-              f"{agg['psnr']['std']:>10.2f}  "
-              f"{agg['psnr']['min']:>10.2f}  "
-              f"{agg['psnr']['max']:>10.2f}")
+        if 'lpips' in aggregate:
+            lpips = aggregate['lpips']
+            print(f"LPIPS: {lpips['mean']:.4f} ± {lpips['std']:.4f}")
+            print(f"      [min: {lpips['min']:.4f}, max: {lpips['max']:.4f}]")
         
-        print(f"{'SSIM':<10} "
-              f"{agg['ssim']['mean']:>10.4f}  "
-              f"{agg['ssim']['std']:>10.4f}  "
-              f"{agg['ssim']['min']:>10.4f}  "
-              f"{agg['ssim']['max']:>10.4f}")
-        
-        print(f"{'LPIPS':<10} "
-              f"{agg['lpips']['mean']:>10.4f}  "
-              f"{agg['lpips']['std']:>10.4f}  "
-              f"{agg['lpips']['min']:>10.4f}  "
-              f"{agg['lpips']['max']:>10.4f}")
-        
-        print(f"\n{'='*80}\n")
-    
-    @torch.no_grad()
-    def render_novel_view( self, camera: Camera, H: int, W: int, near: float, far: float, save_path: Optional[Path] = None, **render_kwargs) -> torch.Tensor:
-        """_summary_
-
-        Args:
-            camera (Camera): _description_
-            H (int): _description_
-            W (int): _description_
-            near (float): _description_
-            far (float): _description_
-            save_path (Optional[Path], optional): _description_. Defaults to None.
-
-        Returns:
-            torch.Tensor: _description_
-        """
-        self.model.eval()
-        
-        rays_o, rays_d = camera.rays(H, W, device=self.device)
-        bounds = torch.tensor([[near, far]], device=self.device).expand(rays_o.shape[0], 2)
-        
-        focal = camera.intrinsics.fl_x
-        radii = torch.full((rays_o.shape[0],), 2.0 / focal, device=self.device)
-        outputs = self.model(rays_o, rays_d, bounds, radii, **render_kwargs)
-        rgb = outputs.get('rgb', outputs.get('rgb0'))
-        rgb = rgb.reshape(H, W, 3)
-        
-        if save_path:
-            self.exporter.save_image(rgb, save_path)
-            print(f"Novel view saved to {save_path}")
-        
-        return rgb
+        print(f"{'='*50}\n")
     
     @torch.no_grad()
-    def render_video( self, cameras: List[Camera], H: int, W: int, near: float, far: float, output_path: Path, fps: int = 30, quality: int = 8, **render_kwargs):
+    def render_video(self, 
+                    cameras: List[Camera],
+                    H: int,
+                    W: int,
+                    output_path: str,
+                    fps: int = 30,
+                    **render_kwargs):
+      
         frames = []
+        print(f"\n🎬 video render ({len(cameras)} frames)...")
         
-        print(f"\nRendering video with {len(cameras)} frames...")
-        
-        for i, camera in enumerate(tqdm(cameras, desc="Rendering")):
-            frame = self.render_novel_view(
-                camera, H, W, near, far, **render_kwargs
-            )
-            frames.append(frame.cpu())
+        for i, camera in enumerate(tqdm(cameras, desc="Render")):
+            rays_o, rays_d = camera.rays(H, W, device=self.device)
             
-            if (i + 1) % 10 == 0:
-                print(f"  Rendered {i + 1}/{len(cameras)} frames")
+            num_rays = rays_o.shape[0]
+            near, far = self.dataset.near, self.dataset.far
+            bounds = torch.tensor([[near, far]], device=self.device).expand(num_rays, 2)
+            radii = torch.full((num_rays,), 2.0 / camera.intrinsics.fl_x, device=self.device)
+            
+            outputs = self.model(rays_o, rays_d, bounds, radii, **render_kwargs)
+            
+            rgb = outputs.get('rgb_fine', outputs.get('rgb_coarse'))
+            if rgb is None:
+                rgb = outputs.get('rgb', outputs.get('rgb0'))
+            
+            if rgb is not None:
+                rgb = rgb.reshape(H, W, 3).cpu()
+                frames.append(rgb)
         
-        self.exporter.save_video( frames, output_path=output_path, fps=fps,quality=quality)
+        if frames:
+            self.exporter.save_video(frames, output_path=output_path, fps=fps)
+            print(f"Video saved: {output_path}")

@@ -1,7 +1,9 @@
 import torch 
 import torch.nn as nn
 from typing import Tuple, Union, Literal, Optional, List 
-from pathlib impo
+from pathlib import Path
+import torch.nn.functional as F
+import lpips
 
 class Metrics:
     def __init__(self, device: str = 'cpu'):
@@ -39,12 +41,12 @@ class Metrics:
         Returns:
             torch.Tensor: _description_
         """
-        if isinstance(mse, float):
+        if not isinstance(mse, torch.Tensor):
             mse = torch.tensor(mse)
 
         return -10.0 * torch.log10(mse)
     
-    def _prepare_images(img1: torch.Tensor, img2: torch.Tensor, format: Literal['HWC','NCHW', 'NHWC'] = 'NCHW')-> tuple[torch.Tensor, torch.Tensor]:
+    def _prepare_images(self, img1: torch.Tensor, img2: torch.Tensor, format: Literal['HWC','NCHW', 'NHWC'] = 'NCHW')-> tuple[torch.Tensor, torch.Tensor]:
         if format == 'HWC':
             img1 = img1.permute(2, 0, 1).unsqueeze(0)  # (1, 3, H, W)
             img2 = img2.permute(2, 0, 1).unsqueeze(0)  # (1, 3, H, W)
@@ -68,19 +70,19 @@ class Metrics:
         Returns:
             torch.Tensor: _description_
         """
-        pred, target = self.__prepare__images(pred, target, format)
-        C1 = 0.01.pow(2)
-        C2 = 0.03.pow(2)
+        pred, target = self._prepare_images(pred, target, format)
+        C1 = 0.01**(2)
+        C2 = 0.03**(2)
         
         mu1 = F.avg_pool2d(pred, window_size, stride=1, padding=window_size // 2)
         mu2 = F.avg_pool2d(target, window_size, stride=1, padding=window_size // 2)
         
-        mu1_sq = mu1.pow(2)
-        mu2_sq = mu2.pow(2)
+        mu1_sq = mu1**(2)
+        mu2_sq = mu2**(2)
         mu1_mu2 = mu1 * mu2
 
-        sigma1_sq = F.avg_pool2d(pred.pow(2), window_size, stride=1, padding=window_size // 2) - mu1_sq
-        sigma2_sq = F.avg_pool2d(target.pow(2), window_size, stride=1, padding=window_size // 2) - mu2_sq
+        sigma1_sq = F.avg_pool2d(pred**(2), window_size, stride=1, padding=window_size // 2) - mu1_sq
+        sigma2_sq = F.avg_pool2d(target**(2), window_size, stride=1, padding=window_size // 2) - mu2_sq
         sigma12 = F.avg_pool2d(pred * target, window_size, stride=1, padding=window_size // 2) - mu1_mu2
         ssim_map = ((2 * mu1_mu2 + C1) * (2 * sigma12 + C2)) / ((mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2))
 
@@ -100,7 +102,7 @@ class Metrics:
         Returns:
             torch.Tensor: _description_
         """
-        pred, target = self.__prepare_images(pred, target, format)
+        pred, target = self._prepare_images(pred, target, format)
         pred = pred.to(self.device)
         target = target.to(self.device)
         
@@ -137,7 +139,7 @@ class Metrics:
             'lpips': lpips_val
         }
 
-def img2mse(pred: torch.Tensor, target: torch.Tensor, reduction: str = 'mean') -> torch.Tensor:
+def img2mse(pred: torch.Tensor, target: torch.Tensor, reduction: Literal['mean', 'sum', 'none'] = 'mean') -> torch.Tensor:
     """_summary_
 
     Args:
