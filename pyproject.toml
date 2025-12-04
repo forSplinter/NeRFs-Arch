@@ -57,3 +57,4 @@ dev = [
 [project.scripts]
 preprocess = "scripts.preprocessing:main"
 colmap2nerf = "scripts.colmaprunner:main"
+splitdataset = "scripts.splitdataset:main"
