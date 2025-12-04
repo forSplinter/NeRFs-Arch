@@ -86,3 +86,6 @@ class MipVolumeRenderer(VolumeRenderer):
         weights_padded = torch.cat([weights, torch.zeros_like(weights[..., :1])], dim=-1)
         
         return dict(rgb=rgb_map, disp=disp_map, acc=acc_map, weights=weights_padded, depth=depth_map)
+
+class InstantNGPRenderer(VolumeRenderer):
+    pass 
