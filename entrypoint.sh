@@ -22,9 +22,9 @@ source $HOME/.cargo/env
 
 uv venv .venv
 source .venv/bin/activate
-uv pip install -e .
-uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
+uv pip install e . --no-deps
+uv pip install mlflow numpy tqdm pillow scikit-image opencv-python imageio pyyaml
 mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri sqlite:///mlflow.db &
 sleep 5
 
