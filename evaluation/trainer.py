@@ -10,7 +10,6 @@ from PIL import Image
 import mlflow
 import tempfile
 
-from build.lib.evaluation.trainer import load_checkpoint
 from model.mip_nerf import MipNeRF
 from utils.dataset import RayNeRFDataset
 from utils.metrics import img2mse, mse2psnr
@@ -61,6 +60,13 @@ def save_checkpoint(path: str, step: int, model: torch.nn.Module, optimizer: tor
         'model': model.state_dict(),
         'optimizer': optimizer.state_dict()
     }, path)
+
+def load_checkpoint(path: str, model: torch.nn.Module, optimizer: torch.optim.Optimizer, device: str) -> int:
+    """Load checkpoint and return the step number"""
+    checkpoint = torch.load(path, map_location=device)
+    model.load_state_dict(checkpoint['model'])
+    optimizer.load_state_dict(checkpoint['optimizer'])
+    return checkpoint['step']
 
 def log_sample_image(model, dataset, idx, step, device, use_mlflow):
     """Log a sample rendered image to MLflow - CORRIGÉE"""
@@ -115,6 +121,7 @@ def log_sample_image(model, dataset, idx, step, device, use_mlflow):
         
     except Exception as e:
         print(f"Failed to log sample image: {e}")
+
 
 def train(
     model_type: str = 'mipnerf',
