@@ -87,9 +87,6 @@ def log_sample_image(model, dataset, idx, step, device, use_mlflow):
                 rays_o = rays[:, 0].reshape(-1, 3).to(device)
                 rays_d = rays[:, 1].reshape(-1, 3).to(device)
             
-            print(f"  rays_o.shape après reshape = {rays_o.shape}")
-            print(f"  Attendu: [{H*W}, 3] = [{H*W}, 3]")
-            
             bounds = torch.tensor([[dataset.near, dataset.far]], device=device).expand(rays_o.shape[0], 2)
             radii = torch.full((rays_o.shape[0],), dataset.radii(), device=device)
             
