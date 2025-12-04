@@ -62,10 +62,11 @@ class CameraExtrinsics:
         if points_world.dim() == 1:
             points_world = points_world.unsqueeze(0) #make it (1,3)
         
-        ones = torch.ones((points_world.shape[0], 1), dtype=torch.float32)
+        ones = torch.ones((points_world.shape[0], 1), dtype=torch.float32, device=points_world.device)
         pw_h = torch.cat([points_world, ones], dim=-1)  # (N,4)
-        pc_h = (self.w2c @ pw_h.T).T  # (N,4)
-
+        
+        w2c = self.w2c.to(points_world.device)
+        pc_h = (w2c @ pw_h.T).T  # (N,4)
         return pc_h[:, :3]
     
     def camera2world(self, points_camera):
@@ -80,8 +81,20 @@ class CameraExtrinsics:
         if points_camera.dim() == 1:
             points_camera = points_camera.unsqueeze(0) #make it (1,3)
         
-        ones = torch.ones((points_camera.shape[0], 1), dtype=torch.float32)
+        ones = torch.ones((points_camera.shape[0], 1), dtype=torch.float32, device=points_camera.device)
         pc_h = torch.cat([points_camera, ones], dim=-1)  # (N,4)
-        pw_h = (self.c2w @ pc_h.T).T  # (N,4)
-
+        
+        c2w = self.c2w.to(points_camera.device)
+        pw_h = (c2w @ pc_h.T).T  # (N,4)
         return pw_h[:, :3]
+
+    def to(self, device):
+        """_summary_
+
+        Args:
+            device (_type_): _description_
+        """
+        self.c2w = self.c2w.to(device)
+        self.R = self.R.to(device)
+        self.t = self.t.to(device)
+        self.w2c = self.w2c.to(device)

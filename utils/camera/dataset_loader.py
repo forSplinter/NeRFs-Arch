@@ -7,7 +7,8 @@ import numpy as np
 
 
 class DatasetLoader:
-    def __init__(self, json_path):
+    def __init__(self, json_path, device='cpu'):
+        self.device = device
         self.data = self._load_json(json_path)
         self.intrinsics = self._parse_intrinsics(self.data)
         self.frames = self._parse_frames(self.data)
@@ -29,6 +30,7 @@ class DatasetLoader:
             p1=data.get("p1", 0.0),
             p2=data.get("p2", 0.0),
             is_fisheye=data.get("is_fisheye", False),
+            device=self.device
         )
 
     def _parse_frames(self, data):
@@ -39,7 +41,8 @@ class DatasetLoader:
             frame = Camera(
                 intrinsics=self.intrinsics,
                 extrinsics=extrinsics,
-                image_path=frame_data["file_path"]
+                image_path=frame_data["file_path"],
+                device=self.device
             )
             frames.append(frame)
         return frames

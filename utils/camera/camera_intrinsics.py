@@ -1,7 +1,7 @@
 import torch
 
 class CameraIntrinsics:
-    def __init__(self, fl_x, fl_y, k1, k2, p1, p2, cx, cy,w, h, camera_angle_x=None, camera_angle_y=None, aabb_scale=16, is_fisheye=False):
+    def __init__(self, fl_x, fl_y, k1, k2, p1, p2, cx, cy,w, h, camera_angle_x=None, camera_angle_y=None, aabb_scale=16, is_fisheye=False, device='cpu'):
         """_summary_
 
         Args:
@@ -33,11 +33,12 @@ class CameraIntrinsics:
         self.camera_angle_y = camera_angle_y
         self.aabb_scale = aabb_scale
         self.is_fisheye = is_fisheye
+        self.device = device
     
     def get_focal(self):
         """_summary_
         """
-        return torch.tensor([self.fl_x, self.fl_y], dtype=torch.float32)
+        return torch.tensor([self.fl_x, self.fl_y], dtype=torch.float32, device=self.device)
     
     def get_ppoint(self):
         """_summary_
@@ -47,7 +48,7 @@ class CameraIntrinsics:
     def get_distortion(self):
         """_summary_
         """
-        return torch.tensor([self.k1, self.k2, self.p1, self.p2], dtype=torch.float32)
+        return torch.tensor([self.k1, self.k2, self.p1, self.p2], dtype=torch.float32, device=self.device)
     
     def get_K(self):
         """_summary_
@@ -78,4 +79,13 @@ class CameraIntrinsics:
             #TODO Implement fisheye undistortion 
             pass
         return points_2d 
+    
+    def to(self, device):
+        """_summary_
+
+        Args:
+            device (_type_): _description_
+        """
+        self.device = device
+        
     
