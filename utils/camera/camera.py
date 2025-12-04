@@ -106,3 +106,75 @@ class Camera:
         origin = pos.expand_as(d_world)#ray origins
         
         return origin, d_world
+    
+    #This part is inspired by the NeRF rendering approch from the orignal paper 
+    def get_rays_perspective(self, H: int, W: int, device="cpu", dtype=torch.float32) -> tuple[torch.Tensor, torch.Tensor]:
+        K = self.intrinsics.get_K().to(device=device, dtype=dtype)
+        c2w = self.extrinsics.get_c2w().to(device=device, dtype=dtype)
+        
+        # Grille de pixels
+        i, j = torch.meshgrid(
+            torch.linspace(0, W-1, W, device=device, dtype=dtype),
+            torch.linspace(0, H-1, H, device=device, dtype=dtype),
+            indexing='xy'
+        )
+        
+        dirs = torch.stack([
+            (i - K[0, 2]) / K[0, 0],
+            -(j - K[1, 2]) / K[1, 1],
+            -torch.ones_like(i)
+        ], dim=-1)  # (H, W, 3)
+        
+        rays_d = torch.sum(dirs[..., None, :] * c2w[:3, :3], dim=-1)  # (H, W, 3)
+        rays_o = c2w[:3, 3].expand(rays_d.shape)  # (H, W, 3)
+        
+        return rays_o, rays_d
+    
+    def get_rays_orthographic(self, H: int, W: int, device="cpu", dtype=torch.float32, z_dir=-1.0) -> tuple[torch.Tensor, torch.Tensor]:
+        
+        K = self.intrinsics.get_K().to(device=device, dtype=dtype)
+        c2w = self.extrinsics.get_c2w().to(device=device, dtype=dtype)
+        
+        i, j = torch.meshgrid(
+            torch.linspace(0, W-1, W, device=device, dtype=dtype),
+            torch.linspace(0, H-1, H, device=device, dtype=dtype),
+            indexing='xy'
+        )
+        
+        dirs = torch.stack([
+            torch.zeros_like(i),
+            torch.zeros_like(i),
+            z_dir * torch.ones_like(i)
+        ], dim=-1)
+        rays_d = torch.sum(dirs[..., None, :] * c2w[:3, :3], dim=-1)
+        
+        origins = torch.stack([
+            (i - K[0, 2]) / K[0, 0],
+            -(j - K[1, 2]) / K[1, 1],
+            torch.zeros_like(i)
+        ], dim=-1)
+        origins = torch.sum(origins[..., None, :] * c2w[:3, :3], dim=-1)
+        rays_o = origins + c2w[:3, 3]
+        
+        return rays_o, rays_d
+    
+    def to_ndc_rays(self, rays_o: torch.Tensor, rays_d: torch.Tensor, near: float = 1.0) -> tuple[torch.Tensor, torch.Tensor]:
+        
+        H, W = rays_o.shape[:2]
+        focal = self.intrinsics.fl_x  
+        
+        t = -(near + rays_o[..., 2]) / rays_d[..., 2]
+        rays_o = rays_o + t[..., None] * rays_d
+        
+        o0 = -1.0 / (W / (2.0 * focal)) * rays_o[..., 0] / rays_o[..., 2]
+        o1 = -1.0 / (H / (2.0 * focal)) * rays_o[..., 1] / rays_o[..., 2]
+        o2 = 1.0 + 2.0 * near / rays_o[..., 2]
+        
+        d0 = -1.0 / (W / (2.0 * focal)) * (rays_d[..., 0] / rays_d[..., 2] - rays_o[..., 0] / rays_o[..., 2])
+        d1 = -1.0 / (H / (2.0 * focal)) * (rays_d[..., 1] / rays_d[..., 2] - rays_o[..., 1] / rays_o[..., 2])
+        d2 = -2.0 * near / rays_o[..., 2]
+        
+        rays_o_ndc = torch.stack([o0, o1, o2], dim=-1)
+        rays_d_ndc = torch.stack([d0, d1, d2], dim=-1)
+        
+        return rays_o_ndc, rays_d_ndc

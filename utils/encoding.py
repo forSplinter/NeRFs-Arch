@@ -198,14 +198,21 @@ class HashEncoding(nn.Module):
         return idx % self.hashmap_size
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """_summary_
-
-        Args:
-            x (torch.Tensor): _description_
-
-        Returns:
-            torch.Tensor: _description_
         """
+        Args:
+            x: (B, N, 3) or (N, 3) positions in [0, 1]
+        
+        Returns:
+            (B, N, encoded_dim) or (N, encoded_dim) encoded features
+        """
+        # Handle both (B, N, 3) and (N, 3) inputs
+        input_shape = x.shape
+        if x.dim() == 2:
+            x = x.unsqueeze(0)  # (N, 3) -> (1, N, 3)
+            squeeze_output = True
+        else:
+            squeeze_output = False
+        
         B, N, _ = x.shape
         out = []
 
@@ -249,9 +256,14 @@ class HashEncoding(nn.Module):
             out.append(level_feat)
         
         pe = torch.cat(out, dim=-1)
+        
         if self.include_input:
             pe = torch.cat([x, pe], dim=-1)
-            
+        
+        # Restore original shape if needed
+        if squeeze_output:
+            pe = pe.squeeze(0)  # (1, N, encoded_dim) -> (N, encoded_dim)
+        
         return pe
 
 class TriangularEncoding(nn.Module):
