@@ -128,41 +128,43 @@ class Camera:
             "P": self.P.to(device=device, dtype=dtype)
         }
     
-    def rays(self, H: int, W: int, device=None, dtype=torch.float32) -> tuple[torch.Tensor, torch.Tensor]:
-        """Generate ray origins and directions for all pixels (FIXED VERSION)
-        
+    def rays(self, H: int, W: int, device="cpu", dtype=torch.float32) -> tuple[torch.Tensor, torch.Tensor]:
+        """Generate ray origins and directions for all pixels
         Args:
             H (int): Image height
             W (int): Image width
-            device (str, optional): Device to place tensors on. If None, uses self.device
+            device (str): Device to place tensors on ('cpu' or 'cuda')
             dtype: Data type for tensors
-            
         Returns:
             tuple[torch.Tensor, torch.Tensor]: (origins, directions) both (H*W, 3)
         """
-        if device is None:
-            device = self.device
-        
-        # Create pixel grid on the correct device
+    # Create pixel grid on the correct device
         i, j = torch.meshgrid(
             torch.arange(W, device=device, dtype=dtype),
             torch.arange(H, device=device, dtype=dtype),
             indexing='xy'
         )
-        pixels = torch.stack([i, j], dim=-1).reshape(-1, 2)  # (H*W, 2)
+        pixels = torch.stack([i, j], dim=-1).reshape(-1, 2)
         
-        d_cam = self.unproject_torch(pixels)  # (H*W, 3) in camera space
-        
-        # Get camera position
-        pos = self.extrinsics.get_position().to(device=device, dtype=dtype)
-        pos = pos.reshape(1, 3)
+        d_cam = self.unproject(pixels.cpu().numpy())  # (H*W, 3) unprojection to camera space
+        d_cam = torch.tensor(d_cam, device=device, dtype=dtype)
+    
+        pos = self.extrinsics.get_position()
+        if isinstance(pos, torch.Tensor):
+            pos = pos.to(device=device, dtype=dtype).reshape(1, 3)
+        else:
+            pos = torch.tensor(pos, device=device, dtype=dtype).reshape(1, 3)
         
         # Transform to world space
-        d_world = self.extrinsics.camera2world(d_cam) - pos  # (H*W, 3)
+        d_world = self.extrinsics.camera2world(d_cam)
+        d_world = d_world.to(device=device, dtype=dtype)
+        
+        d_world = d_world - pos  # (H*W, 3) direction in world space
         d_world = d_world / torch.norm(d_world, dim=-1, keepdim=True)
-        
-        origin = pos.expand_as(d_world)  # Ray origins
-        
+    
+        # Ray origins (same for all rays from this camera)
+        origin = pos.expand_as(d_world)  # (H*W, 3)
+    
         return origin, d_world
     
     def get_rays_perspective(self, H: int, W: int, device=None, dtype=torch.float32) -> tuple[torch.Tensor, torch.Tensor]:
