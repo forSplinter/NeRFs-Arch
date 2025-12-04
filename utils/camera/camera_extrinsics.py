@@ -94,7 +94,9 @@ class CameraExtrinsics:
         Args:
             device (_type_): _description_
         """
+        self.device = device
         self.c2w = self.c2w.to(device)
         self.R = self.R.to(device)
         self.t = self.t.to(device)
         self.w2c = self.w2c.to(device)
+        return self 

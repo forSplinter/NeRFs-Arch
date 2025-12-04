@@ -87,5 +87,6 @@ class CameraIntrinsics:
             device (_type_): _description_
         """
         self.device = device
+        return self
         
     

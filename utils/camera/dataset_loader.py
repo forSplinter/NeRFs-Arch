@@ -54,3 +54,21 @@ class DatasetLoader:
     
     def __getitem__(self, idx: int) -> dict:
         return self.frames[idx]
+    
+    def to(self, device):
+        """Move all data to specified device
+        
+        Args:
+            device: Target device ('cpu' or 'cuda')
+            
+        Returns:
+            self for method chaining
+        """
+        self.device = device
+        self.intrinsics.to(device)
+        for frame in self.frames:
+            if hasattr(frame, 'extrinsics'):
+                frame.extrinsics.to(device)
+            if hasattr(frame, 'to'):
+                frame.to(device)
+        return self
