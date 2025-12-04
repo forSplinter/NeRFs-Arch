@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from typing import Optional, List, Tuple, Dict
 import torch.utils.data
-from model.camera.dataset_loader import DatasetLoader
+from utils.camera.dataset_loader import DatasetLoader
 import imageio.v3 as iio
 
 
