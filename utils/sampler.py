@@ -195,27 +195,3 @@ class HierarchicalSampler(nn.Module):
         else:
             return z_vals, None, ret_extras
 
-def compute_weights(density: torch.Tensor, z_vals: torch.Tensor, rays_d: torch.Tensor) -> torch.Tensor:
-    """
-    """
-    dists = z_vals[..., 1:] - z_vals[..., :-1]  # [N_rays, N_samples-1]
-    
-    last_dist = dists[..., -1:]  # Repeat the last delta
-    dists = torch.cat([dists, last_dist], dim=-1)  # [N_rays, N_samples]
-    
-    dists = dists * torch.norm(rays_d[..., None, :], dim=-1)
-    
-    alpha = 1.0 - torch.exp(-F.relu(density) * dists)
-    alpha = torch.clamp(alpha, 0.0, 1.0 - 1e-7) #prevent nan in transmittance calculation
-
-    transparency = 1.0 - alpha + 1e-10
-    transparency = torch.clamp(transparency, 1e-10, 1.0)  # prevent nans
-    
-    transmittance = torch.cumprod(
-        torch.cat([torch.ones_like(alpha[..., :1]), transparency[..., :-1]], dim=-1), dim=-1
-    )
-    transmittance = torch.clamp(transmittance, 1e-10) #prevent nans
-    
-    weights = alpha * transmittance
-    
-    return weights
