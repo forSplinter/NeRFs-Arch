@@ -188,9 +188,7 @@ class MipNeRF(nn.Module):
             radii =  radii[..., None].expand(t0.shape)
         
         else:
-            repeat_factor = t0.shape[0]//radii.shape[0]
-            radii = radii[..., None].expand(-1, repeat_factor).reshape(t0.shape)
-            print(f" MipNeRF: Fixed radii shape {radii.shape[0]} -> {t0.shape[0]}")
+            radii = radii[..., None].expand(t0.shape) 
         
         if ray_shape == 'cone':
             means, covs = self.conical_frustum_to_gaussian(
