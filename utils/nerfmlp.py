@@ -93,6 +93,84 @@ class MLP(nn.Module):
         
         return outputs
 
+class NerfMLP(nn.Module):
+    def __init__(self, input_dim: int = 3, output_dim: int = 4, net_depth: int = 8, net_width: int = 256, skips: Optional[list[int]] = None,
+        viewdirs: bool = True, use_embed: bool = True, multires: int = 10, multires_views: int = 4, netchunk: int = 1024 * 64) -> None:
+        super().__init__()
+        self.viewdirs = viewdirs
+        self.chunk = netchunk 
+        
+        if skips is None:
+            skips = [4]
+        
+        if use_embed:
+            from utils.encoding import PositionalEncoding
+            self.embedder = PositionalEncoding(L=multires, include_input=True)
+            input_ch = input_dim + 2 * multires * input_dim
+            
+            if viewdirs:
+                self.embeddirs = PositionalEncoding(L=multires_views, include_input=True)
+                input_ch_views = input_dim + 2 * multires_views * input_dim
+            else:
+                self.embeddirs = None
+                input_ch_views = 0
+        else:
+            self.embedder = lambda x: x
+            self.embeddirs = lambda x: x if viewdirs else None
+            input_ch = input_dim
+            input_ch_views = input_dim if viewdirs else 0
+        
+        self.mlp = MLP( D=net_depth, W=net_width, input_ch=input_ch, input_ch_views=input_ch_views, output_ch=output_dim, skips=skips, use_viewdirs=viewdirs)
+    
+    def forward(self, x: torch.Tensor, viewdirs: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """
+        Args:
+            x: (..., 3) positions
+            viewdirs: (..., 3) view directions
+        
+        Returns:
+            (..., 4) RGB + density
+        """
+        if self.embedder is None:
+            raise ValueError("Position embedder has not been set.")
+        
+        # Store original shape
+        input_shape = x.shape[:-1]
+        
+        # Flatten
+        x_flat = x.reshape(-1, x.shape[-1])
+        
+        if viewdirs is not None:
+            viewdirs_flat = viewdirs.reshape(-1, viewdirs.shape[-1])
+            assert x_flat.shape[0] == viewdirs_flat.shape[0], \
+                f"Mismatch: {x_flat.shape[0]} pts vs {viewdirs_flat.shape[0]} dirs"
+        else:
+            viewdirs_flat = None
+        # Process in chunks
+        output_chunks = []
+        for i in range(0, x_flat.shape[0], self.chunk):
+            end = min(i + self.chunk, x_flat.shape[0])
+            embedded = self.embedder(x_flat[i:end]) # (chunk, encoded_dim_points)
+
+            if self.viewdirs and viewdirs_flat is not None:
+                if self.embeddirs is None:
+                    raise ValueError("Direction embedder not set.")
+                else:
+                    embedded_dirs = self.embeddirs(viewdirs_flat[i:end]) # (chunk, encoded_dim_dirs)
+                
+                embedded = torch.cat([embedded, embedded_dirs], dim=-1)
+            
+            # Forward through MLP
+            chunk_output = self.mlp(embedded)
+            output_chunks.append(chunk_output)
+        
+        # Concatenate chunks
+        output_flat = torch.cat(output_chunks, dim=0)
+        
+        # Unflatten to original shape
+        output_shape = tuple(input_shape) + (output_flat.shape[-1],)
+        return output_flat.reshape(output_shape)
+
 class MipMLP(nn.Module):
     def __init__(self, input_dim: int = 3, output_dim: int = 4, net_depth: int = 8, net_width: int = 256, skips: Optional[list[int]] = None,
         viewdirs: bool = True, use_embed: bool = True, multires: int = 10, multires_views: int = 4, netchunk: int = 1024 * 64) -> None:
