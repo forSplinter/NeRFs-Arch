@@ -1,0 +1,51 @@
+# configs/lot1_gpu.yaml
+experiment_name: lot1_4x3090
+dataset: lot1
+mlflow_uri: "http://0.0.0.0:5001"
+
+data:
+  train_path: "nerfdataset/lot1/transforms_train.json"
+  val_path: "nerfdataset/lot1/transforms_val.json"
+  test_path: "nerfdataset/lot1/transforms_test.json"
+  white_bkgd: true
+  near: 0.1
+  far: 100.0
+
+model:
+  type: "mipnerf"
+  net_depth: 8
+  net_width: 256
+  net_depth_fine: 8
+  net_width_fine: 256
+  N_samples: 128
+  N_importance: 256
+  use_viewdirs: true
+  use_embed: true
+  multires: 10
+  multires_views: 4
+  white_bkgd: true
+  use_hierarchical: true
+
+training:
+  batch_size: 16384
+  max_steps: 200000
+  lr: 5e-4
+  lr_decay_steps: 150000
+  lr_decay_rate: 0.1
+  i_print: 100
+  i_weights: 10000
+  i_testset: 50000
+  num_workers: 16
+
+evaluation:
+  save_images: false
+  save_comparisons: false
+  max_val_images: 5
+  metrics: ["psnr", "ssim", "lpips"]
+
+system:
+  seed: 42
+  precision: "fp32"
+  benchmark: true
+  deterministic: false
+  device: "cuda"

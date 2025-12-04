@@ -60,7 +60,7 @@ def main():
                        help='Take 1 out of every N images for test set')
     
     args = parser.parse_args()
-    split_dataset_nerf(args.json_path, args.test_skip)
+    split_dataset(args.json_path, args.test_skip)
 
 
 if __name__ == '__main__':

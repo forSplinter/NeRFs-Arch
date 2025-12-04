@@ -249,7 +249,8 @@ class MipMLP(nn.Module):
                 else:
                     embedded_dirs = self.embeddirs(viewdirs_flat[i:end])
                 
-                embedded = torch.cat([embedded, embedded_dirs], dim=-1)
+                if embedded_dirs is not None:
+                    embedded = torch.cat([embedded, embedded_dirs], dim=-1)
             
             # Forward through MLP
             chunk_output = self.mlp(embedded)
@@ -388,12 +389,17 @@ class InstantNGP(nn.Module):
             geo_feat = density_geo[..., 1:]
             
             # Predict color
+            # Predict color
             if self.viewdirs and viewdirs_flat is not None:
                 if self.dir_encoder is not None:
                     encoded_dirs = self.dir_encoder(viewdirs_flat[i:end])
+                    if encoded_dirs is not None:
+                        color_input = torch.cat([geo_feat, encoded_dirs], dim=-1)
+                    else:
+                        color_input = geo_feat
                 else:
                     encoded_dirs = viewdirs_flat[i:end]
-                color_input = torch.cat([geo_feat, encoded_dirs], dim=-1)
+                    color_input = torch.cat([geo_feat, encoded_dirs], dim=-1)
             else:
                 color_input = geo_feat
             
