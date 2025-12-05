@@ -14,19 +14,19 @@ model:
   net_width: 256
   net_depth_fine: 8
   net_width_fine: 256
-  N_samples: 128             
-  N_importance: 256          
+  N_samples:  64           
+  N_importance: 128          
   use_viewdirs: true
   use_embed: true
   multires: 10
   multires_views: 4
   white_bkgd: true
   use_hierarchical: true
-  ray_chunk: 8192           
-  pts_chunk: 16384           
+  ray_chunk: 4096          
+  pts_chunk: 8192           
 
 training:
-  batch_size: 16384          
+  batch_size: 8192         
   max_steps: 1000000
   lr: 5e-4
   lr_decay_steps: 50000 
