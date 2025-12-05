@@ -9,12 +9,14 @@ import numpy as np
 from PIL import Image
 import mlflow
 import tempfile
+from torch.optim.lr_scheduler import LambdaLR
 
 from model.mip_nerf import MipNeRF
 from utils.dataset import RayNeRFDataset
 from utils.metrics import img2mse, mse2psnr
 
 def train_one_step_with_logging(batch: dict, model: torch.nn.Module, optimizer: torch.optim.Optimizer, 
+                               scheduler: Optional[torch.optim.lr_scheduler.LRScheduler],
                                near: float, far: float, radii: float, device: str, 
                                step: int, use_mlflow: bool) -> dict:
     """Train one step with MLflow logging"""
@@ -42,6 +44,9 @@ def train_one_step_with_logging(batch: dict, model: torch.nn.Module, optimizer: 
     loss.backward()
     optimizer.step()
     
+    if scheduler is not None:
+        scheduler.step()
+    
     psnr = mse2psnr(loss).item()
     
     # Log metrics to MLflow
@@ -54,22 +59,85 @@ def train_one_step_with_logging(batch: dict, model: torch.nn.Module, optimizer: 
     
     return {'loss': loss.item(), 'psnr': psnr}
 
-def save_checkpoint(path: str, step: int, model: torch.nn.Module, optimizer: torch.optim.Optimizer):
-    torch.save({
+def save_checkpoint(path: str, step: int, model: torch.nn.Module, optimizer: torch.optim.Optimizer,
+                    scheduler: Optional[torch.optim.lr_scheduler.LRScheduler] = None)-> None:
+    """_summary_
+
+    Args:
+        path (str): _description_
+        step (int): _description_
+        model (torch.nn.Module): _description_
+        optimizer (torch.optim.Optimizer): _description_
+        scheduler (Optional[torch.optim.lr_scheduler._LRScheduler], optional): _description_. Defaults to None.
+    """
+    checkpoint = {
         'step': step,
         'model': model.state_dict(),
         'optimizer': optimizer.state_dict()
-    }, path)
+    }
+    if scheduler is not None:
+        checkpoint['scheduler'] = scheduler.state_dict()
+    torch.save(checkpoint, path)
 
-def load_checkpoint(path: str, model: torch.nn.Module, optimizer: torch.optim.Optimizer, device: str) -> int:
-    """Load checkpoint and return the step number"""
+def load_checkpoint(path: str, model: torch.nn.Module, optimizer: torch.optim.Optimizer, device: str, 
+                    scheduler: Optional[torch.optim.lr_scheduler._LRScheduler] = None) -> int:
+    """_summary_
+
+    Args:
+        path (str): _description_
+        model (torch.nn.Module): _description_
+        optimizer (torch.optim.Optimizer): _description_
+        device (str): _description_
+        scheduler (Optional[torch.optim.lr_scheduler._LRScheduler], optional): _description_. Defaults to None.
+
+    Returns:
+        int: _description_
+    """
     checkpoint = torch.load(path, map_location=device)
     model.load_state_dict(checkpoint['model'])
     optimizer.load_state_dict(checkpoint['optimizer'])
+
+    if scheduler is not None and 'scheduler' in checkpoint:
+        scheduler.load_state_dict(checkpoint['scheduler'])
     return checkpoint['step']
 
+def create_scheduler(lr: float, optimizer: torch.optim.Optimizer, lr_decay_steps: int, lr_decay_rate: float,
+                     lr_warmup_init: float, lr_decay_warmup_step: int, max_steps: int)-> LambdaLR:
+    """_summary_
+
+    Args:
+        optimizer (torch.optim.Optimizer): _description_
+        lr_decay_steps (int): _description_
+        lr_decay_rate (float): _description_
+        lr_warmup_init (float): _description_
+        lr_decay_warmup_step (int): _description_
+        max_steps (int): _description_
+    """
+    def lr_lambda(step):
+        if step < lr_decay_warmup_step:
+            warmup_factor = step / lr_decay_warmup_step
+            lr_scale = lr_warmup_init + (lr - lr_warmup_init) * warmup_factor
+            return lr_scale / lr
+        
+        else:
+            decay_step = (step - lr_decay_warmup_step) // lr_decay_steps
+            decay_factor = lr_decay_rate ** decay_step
+            return decay_factor
+    
+    return LambdaLR(optimizer, lr_lambda)
+
+def current_lr(optimizer: torch.optim.Optimizer) -> float:
+    """_summary_
+
+    Args:
+        optimizer (torch.optim.Optimizer): _description_
+
+    Returns:
+        float: _description_
+    """
+    return optimizer.param_groups[0]['lr']   
+
 def log_sample_image(model, dataset, idx, step, device, use_mlflow):
-    """Log a sample rendered image to MLflow - CORRIGÉE"""
     if not use_mlflow:
         return
     
@@ -136,13 +204,15 @@ def train(
     resume_from: Optional[str] = None,
     use_tensorboard: bool = True,
     use_mlflow: bool = False,
+    lr_decay_steps: int = 50000,
+    lr_decay_rate: float = 0.1,
+    lr_decay_warmup_step: int = 2000,
+    lr_warmup_init: float = 1e-5,
     **model_kwargs
 ):
-    # Convert lr to float if string
     if isinstance(lr, str):
         lr = float(lr)
     
-    # Filtrer les kwargs
     mipnerf_kwargs = {}
     valid_keys = [
         'net_depth', 'net_width', 'net_depth_fine', 'net_width_fine',
@@ -166,6 +236,16 @@ def train(
     
     model = MipNeRF(**mipnerf_kwargs).to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
+
+    scheduler = create_scheduler(
+        optimizer=optimizer,
+        lr=lr,
+        lr_decay_steps=lr_decay_steps,
+        lr_decay_rate=lr_decay_rate,
+        lr_decay_warmup_step=lr_decay_warmup_step,
+        lr_warmup_init=lr_warmup_init,
+        max_steps=max_steps
+    )
     
     step = 0
     if resume_from and Path(resume_from).exists():
@@ -190,7 +270,7 @@ def train(
         
         # Train step
         metrics = train_one_step_with_logging(
-            batch, model, optimizer, near, far, radii, device, step, use_mlflow
+            batch, model, optimizer, scheduler, near, far, radii, device, step, use_mlflow
         )
         
         # Print progress
@@ -207,7 +287,7 @@ def train(
         # Save checkpoint
         if step % i_weights == 0:
             path = run_dir / 'checkpoints' / f'{step:08d}.ckpt'
-            save_checkpoint(str(path), step, model, optimizer)
+            save_checkpoint(str(path), step, model, optimizer, scheduler)
             print(f"Saved: {path}")
             
             # Log checkpoint to MLflow occasionally
@@ -252,7 +332,7 @@ def train(
                         print(f"  Eval PSNR: {eval_psnr:.2f}")
     
     final_path = run_dir / 'checkpoints' / 'final.ckpt'
-    save_checkpoint(str(final_path), step, model, optimizer)
+    save_checkpoint(str(final_path), step, model, optimizer, scheduler)
     
     if use_mlflow:
         mlflow.log_artifact(str(final_path), "checkpoints")
