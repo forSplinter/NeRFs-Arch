@@ -234,7 +234,12 @@ def train(
     near, far = train_dataset.near, train_dataset.far
     radii = train_dataset.radii()
     
-    model = MipNeRF(**mipnerf_kwargs).to(device)
+    model = MipNeRF(**mipnerf_kwargs)
+    if torch.cuda.device_count() > 1:
+        print(f"Using {torch.cuda.device_count()} GPUs")
+        model = torch.nn.DataParallel(model)
+    model.to(device)
+
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     scheduler = create_scheduler(
