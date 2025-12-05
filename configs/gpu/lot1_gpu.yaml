@@ -22,8 +22,8 @@ model:
   multires_views: 4
   white_bkgd: true
   use_hierarchical: true
-  ray_chunk: 8192           
-  pts_chunk: 16384           
+  ray_chunk: 4096          
+  pts_chunk: 8192           
 
 training:
   batch_size: 8192         
