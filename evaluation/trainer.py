@@ -235,8 +235,8 @@ def train(
     run_dir = Path(run_dir) if run_dir else Path('runs/exp1')
     (run_dir / 'checkpoints').mkdir(exist_ok=True, parents=True)
     
-    train_dataset = RayNeRFDataset(json_path=data_path, split='train', device=device)
-    test_dataset = RayNeRFDataset(json_path=test_data_path, split='val', device=device)
+    train_dataset = RayNeRFDataset(json_path=data_path, split='train', device=device, near=2.0, far=8.0)
+    test_dataset = RayNeRFDataset(json_path=test_data_path, split='val', device=device, near=2.0, far=8.0)
     
     near, far = train_dataset.near, train_dataset.far
     radii = train_dataset.radii()

@@ -6,7 +6,7 @@ data:
   train_path: "nerfdataset/lot1/transforms_train.json"
   val_path: "nerfdataset/lot1/transforms_val.json"
   test_path: "nerfdataset/lot1/transforms_test.json"
-  white_bkgd: true
+  white_bkgd: false
   near: 0.1
   far:  4.0             
 model:
@@ -21,7 +21,7 @@ model:
   use_embed: true
   multires: 10
   multires_views: 4
-  white_bkgd: true
+  white_bkgd: false
   use_hierarchical: true
   ray_chunk: 2048         
   pts_chunk: 4096         
