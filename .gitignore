@@ -233,4 +233,6 @@ terraform.rc
 datapipeline/
 raw/
 processed/
-dataset/
+dataset/logs/
+mlartifacts/
+mlruns/
