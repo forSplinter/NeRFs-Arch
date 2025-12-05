@@ -264,7 +264,7 @@ def train(
     metrics = {'loss': 0.0, 'psnr': 0.0}  # Initialize metrics
     
     # Log initial sample
-    if use_mlflow:
+    if use_mlflow and step> 0:
         log_sample_image(model, test_dataset, log_img_idx, step, device, use_mlflow)
     
     while step < max_steps:
