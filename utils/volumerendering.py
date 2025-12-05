@@ -61,7 +61,7 @@ class MipVolumeRenderer(VolumeRenderer):
             noise = torch.randn(raw[..., :-1].shape[0], device=raw.device) * raw_noise_std
         
         # Extract density for intervals (not samples)
-        density = raw[..., :-1, -1] + noise  # (num_rays, num_samples-1)
+        density = raw[..., -1]  # (num_rays, num_samples-1)
         alpha = 1. - torch.exp(-self.act_fn(density) * dists)
         
         Ts = torch.cat([torch.ones_like(alpha[..., :1]), 1. - alpha + 1e-10], dim=-1)
@@ -70,7 +70,7 @@ class MipVolumeRenderer(VolumeRenderer):
         weights = alpha * Ts  # (num_rays, num_samples-1)
         
         # RGB at interval midpoints
-        rgb = torch.sigmoid(raw[..., :-1, :-1])  # (num_rays, num_samples-1, 3)
+        rgb = torch.sigmoid(raw[..., :3])  # (num_rays, num_samples-1, 3)
         rgb_map = torch.sum(weights[..., None] * rgb, dim=-2)
         depth_map = torch.sum(weights * mids, dim=-1, keepdim=True)
         acc_map = torch.sum(weights, dim=-1, keepdim=True)
