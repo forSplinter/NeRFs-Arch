@@ -234,3 +234,7 @@ datapipeline/
 raw/
 processed/
 dataset/
+dataset/logs/
+logs/
+mlartifacts/
+mlruns/
