@@ -34,8 +34,15 @@ def train_one_step_with_logging(batch: dict, model: torch.nn.Module, optimizer: 
     radii_tensor = torch.full((num_rays,), radii, device=device)
     
     ret_dict = model(rays_o, rays_d, bounds, radii_tensor)
-    
     target = batch['target_s'].to(device)
+    if step % 100 == 0 or step < 5:  # Print les 5 premiers steps et chaque 100
+        print(f"\n🔍 Debug step {step}:")
+        print(f"  rgb range: [{ret_dict['rgb'].min().item():.3f}, {ret_dict['rgb'].max().item():.3f}]")
+        print(f"  target range: [{target.min().item():.3f}, {target.max().item():.3f}]")
+        print(f"  rgb mean: {ret_dict['rgb'].mean().item():.3f}")
+        print(f"  target mean: {target.mean().item():.3f}")
+        print(f"  num_rays: {num_rays}, bounds: [{near}, {far}]")
+
     loss = img2mse(ret_dict['rgb'], target)
     
     if 'rgb0' in ret_dict:
@@ -102,7 +109,7 @@ def load_checkpoint(path: str, model: torch.nn.Module, optimizer: torch.optim.Op
     return checkpoint['step']
 
 def create_scheduler(lr: float, optimizer: torch.optim.Optimizer, lr_decay_steps: int, lr_decay_rate: float,
-                     lr_warmup_init: float, lr_decay_warmup_step: int, max_steps: int)-> LambdaLR:
+                     lr_warmup_init: float, lr_warmup_steps: int, max_steps: int)-> LambdaLR:
     """_summary_
 
     Args:
@@ -110,17 +117,17 @@ def create_scheduler(lr: float, optimizer: torch.optim.Optimizer, lr_decay_steps
         lr_decay_steps (int): _description_
         lr_decay_rate (float): _description_
         lr_warmup_init (float): _description_
-        lr_decay_warmup_step (int): _description_
+        lr_warmup_steps (int): _description_
         max_steps (int): _description_
     """
     def lr_lambda(step):
-        if step < lr_decay_warmup_step:
-            warmup_factor = step / lr_decay_warmup_step
+        if step < lr_warmup_steps:
+            warmup_factor = step / lr_warmup_steps
             lr_scale = lr_warmup_init + (lr - lr_warmup_init) * warmup_factor
             return lr_scale / lr
         
         else:
-            decay_step = (step - lr_decay_warmup_step) // lr_decay_steps
+            decay_step = (step - lr_warmup_steps) // lr_decay_steps
             decay_factor = lr_decay_rate ** decay_step
             return decay_factor
     
@@ -206,7 +213,7 @@ def train(
     use_mlflow: bool = False,
     lr_decay_steps: int = 50000,
     lr_decay_rate: float = 0.1,
-    lr_decay_warmup_step: int = 2000,
+    lr_warmup_steps: int = 2000,
     lr_warmup_init: float = 1e-5,
     **model_kwargs
 ):
@@ -247,7 +254,7 @@ def train(
         lr=lr,
         lr_decay_steps=lr_decay_steps,
         lr_decay_rate=lr_decay_rate,
-        lr_decay_warmup_step=lr_decay_warmup_step,
+        lr_warmup_steps=lr_warmup_steps,
         lr_warmup_init=lr_warmup_init,
         max_steps=max_steps
     )
