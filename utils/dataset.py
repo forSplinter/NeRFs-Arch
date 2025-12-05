@@ -9,7 +9,8 @@ import imageio.v3 as iio
 
 
 class BaseNeRFDataset(torch.utils.data.Dataset):
-    def __init__(self, json_path: str, data_root: Optional[str] = None, cam_id: bool = False, split: str = "train", device: str = "cpu", dtype: torch.dtype = torch.float32):
+    def __init__(self, json_path: str, data_root: Optional[str] = None, cam_id: bool = False, split: str = "train", device: str = "cpu", dtype: torch.dtype = torch.float32
+                , near: Optional[float] = None, far: Optional[float] = None):
         """_summary_
 
         Args:
@@ -35,8 +36,8 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
         self.focal_y = self.intrinsics.fl_y
 
         self.data = self.dataset_loader.data
-        self.near = self.data.get("near", 0.1)
-        self.far = self.data.get("far", 100.0)
+        self.near = near if near is not None else self.data.get("near", 0.1)
+        self.far = far if far is not None else self.data.get("far", 100.0)
         self.aabb_scale = self.data.get("aabb_scale", 16)
 
         self.data_root = data_root
@@ -127,10 +128,13 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
 
 
 class RayNeRFDataset(BaseNeRFDataset):
-    def __init__(self,json_path: str,data_root: Optional[str] = None,cam_id: bool = False,split: str = "train",device: str = "cpu",dtype: torch.dtype = torch.float32,):
+    def __init__(self,json_path: str,data_root: Optional[str] = None,cam_id: bool = False,split: str = "train",device: str = "cpu",dtype: torch.dtype = torch.float32,
+                 near: Optional[float] = None, far: Optional[float] = None):
         super().__init__(json_path, data_root, cam_id, split)
         self.device = device
         self.dtype = dtype
+        self.near = near
+        self.far = far
         self._precompute_rays()
 
     def _precompute_rays(self):

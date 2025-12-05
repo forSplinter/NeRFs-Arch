@@ -184,11 +184,7 @@ class MipNeRF(nn.Module):
         t1 = z_vals[..., 1:]   
         
         # Expand radii to match samples
-        if radii.shape == t0.shape:
-            radii =  radii[..., None].expand(t0.shape)
-        
-        else:
-            radii = radii[..., None].expand(t0.shape) 
+        radii = radii[..., None].expand_as(t0)
         
         if ray_shape == 'cone':
             means, covs = self.conical_frustum_to_gaussian(
@@ -222,25 +218,14 @@ class MipNeRF(nn.Module):
             Dictionary with rendered outputs
         """
         device = rays_o.device
-        z_vals_coarse, _ = self.sampler_coarse(
-            rays_o, rays_d, bounds, zvals_only=True, **kwargs
-        )
-        pts_coarse, cov_coarse = self.cast_rays(
-            z_vals_coarse, rays_o, rays_d, radii
-        )
-        # Expand view directions
+        z_vals_coarse, _ = self.sampler_coarse(rays_o, rays_d, bounds, zvals_only=True, **kwargs)
+        pts_coarse, cov_coarse = self.cast_rays(z_vals_coarse, rays_o, rays_d, radii)
+        z_mids_coarse = 0.5 * (z_vals_coarse[..., :-1] + z_vals_coarse[..., 1:])
         viewdirs = rays_d[..., None, :].expand(pts_coarse.shape) if self.use_viewdirs else None
-        # Coarse network forward
         raw_coarse = self.nerf_coarse(pts_coarse, cov_coarse, viewdirs)
         # Render coarse
-        outputs_coarse = self.renderer(
-            raw_coarse,
-            z_vals_coarse[..., :-1],  # Remove last fencepost
-            rays_d,
-            **kwargs
-        )
-        # Hierarchical sampling
-                # Hierarchical sampling
+        outputs_coarse = self.renderer(raw_coarse, z_mids_coarse, rays_d, **kwargs)
+
         if self.use_hierarchical and self.nerf_fine is not None and self.sampler_fine is not None:
             # Blur weights for stability
             weights = outputs_coarse['weights']
