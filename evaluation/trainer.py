@@ -237,7 +237,7 @@ def train(
     model = MipNeRF(**mipnerf_kwargs)
     if torch.cuda.device_count() > 1:
         print(f"Using {torch.cuda.device_count()} GPUs")
-        model = torch.nn.DataParallel(model, device_ids=list(range(torch.cuda.device_count())), output_device=1)
+        model = torch.nn.DataParallel(model, device_ids=list(range(torch.cuda.device_count())))
     model.to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
