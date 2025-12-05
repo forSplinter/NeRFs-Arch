@@ -7,7 +7,7 @@ data:
   test_path: "nerfdataset/lot1/transforms_test.json"
   white_bkgd: true
   near: 0.1
-  far: 100.0
+  far: 7.0
 model:
   type: "mipnerf"
   net_depth: 8

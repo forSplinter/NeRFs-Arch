@@ -123,7 +123,7 @@ class IntegratedPositionalEncoding(nn.Module):
             cov = torch.diagonal(cov, dim1=-2, dim2=-1)  # [..., input_dim]
         
         # Scale by squared frequencies
-        y = mu[..., None, :] * (self.freq[:, None] ** 2)
+        y = mu[..., None, :] * self.freq[:, None]
         y = y.reshape(*mu.shape[:-1], -1)
 
         y_var = cov[..., None, :] * (self.freq[:, None] ** 2)
