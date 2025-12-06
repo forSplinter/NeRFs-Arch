@@ -1,14 +1,13 @@
 experiment_name: lot1_exp 
-dataset: lot1
+dataset: lot2
 description: "Experiment lot1 with specific settings"
 mlflow_uri: "http://localhost:5001"
 data: 
-  train_path: "nerfdataset/lot1/transforms_train.json"
-  val_path: "nerfdataset/lot1/transforms_val.json"
-  test_path: "nerfdataset/lot1/transforms_test.json"
+  train_path: "nerfdataset/lot2/transforms.json"
+  use_full_dataset: true
   white_bkgd: false
-  near: 0.1
-  far:  4.0             
+  near: 0.877
+  far: 13.702            
 model:
   type: "mipnerf"
   net_depth: 8

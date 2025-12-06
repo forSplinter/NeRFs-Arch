@@ -9,22 +9,15 @@ import imageio.v3 as iio
 
 
 class BaseNeRFDataset(torch.utils.data.Dataset):
-    def __init__(self, json_path: str, data_root: Optional[str] = None, cam_id: bool = False, split: str = "train", device: str = "cpu", dtype: torch.dtype = torch.float32
-                , near: Optional[float] = None, far: Optional[float] = None):
-        """_summary_
-
-        Args:
-            json_path (str): _description_
-            data_root (Optional[str], optional): _description_. Defaults to None.
-            cam_id (bool, optional): _description_. Defaults to False.
-            split (str, optional): _description_. Defaults to "train".
-            device (str, optional): _description_. Defaults to "cpu".
-            dtype (torch.dtype, optional): _description_. Defaults to torch.float32.
-        """
+    def __init__(self, json_path: str, data_root: Optional[str] = None, cam_id: bool = False, split: str = "train", device: str = "cpu", dtype: torch.dtype = torch.float32,
+                 near: Optional[float] = None, far: Optional[float] = None):
         super().__init__()
 
         self.device = device
         self.dtype = dtype
+        self.json_path = json_path
+        self.json_dir = os.path.dirname(os.path.abspath(json_path))
+        
         self.dataset_loader = DatasetLoader(json_path)
         self.cameras = self.dataset_loader.frames  
         self.intrinsics = self.dataset_loader.intrinsics  
@@ -40,11 +33,17 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
         self.far = far if far is not None else self.data.get("far", 100.0)
         self.aabb_scale = self.data.get("aabb_scale", 16)
 
-        self.data_root = data_root
+        self.data_root = data_root if data_root else self.json_dir
         self.has_cam_id = cam_id
         self.split = split
 
         self.rgbs = self._load_images_from_json()
+        
+        if self.rgbs is not None:
+            print(f"Loaded {self.rgbs.shape[0]} images, shape: {self.rgbs.shape}")
+            print(f"RGB range: [{self.rgbs.min():.3f}, {self.rgbs.max():.3f}]")
+        else:
+            print("WARNING: No images loaded!")
 
         if cam_id:
             self.cam_ids = torch.arange(self.image_count, dtype=torch.long)
@@ -56,12 +55,14 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
             if hasattr(camera, 'image_path') and camera.image_path:
                 img_path = camera.image_path
                 
-                if self.data_root:
-                    base_path = os.path.dirname(img_path)
-                    filename = os.path.basename(img_path)
-                    img_path = os.path.join(self.data_root, filename)
+                if not os.path.isabs(img_path):
+                    img_path = os.path.join(self.json_dir, img_path)
                 
                 img_path = os.path.normpath(img_path)
+                
+                if i == 0:
+                    print(f"Loading first image from: {img_path}")
+                    print(f"File exists: {os.path.exists(img_path)}")
                 
                 try:
                     if img_path.endswith('.npy'):
@@ -71,24 +72,31 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
                     
                     if rgb.dtype == np.uint8:
                         rgb = rgb.astype(np.float32) / 255.0
+                    elif rgb.dtype == np.uint16:
+                        rgb = rgb.astype(np.float32) / 65535.0
                     
                     if len(rgb.shape) == 2:
                         rgb = np.stack([rgb, rgb, rgb], axis=-1)
                     elif rgb.shape[2] == 4:
                         rgb = rgb[:, :, :3]
                     
+                    if i == 0:
+                        print(f"First image shape: {rgb.shape}, range: [{rgb.min():.3f}, {rgb.max():.3f}]")
+                    
                     rgbs_list.append(torch.from_numpy(rgb).float())
                     
                 except Exception as e:
-                    print(f"Warning: Could not load image {img_path}: {e}")
+                    print(f"ERROR: Could not load image {img_path}: {e}")
                     dummy_rgb = torch.zeros((self.H, self.W, 3), dtype=torch.float32)
                     rgbs_list.append(dummy_rgb)
             else:
+                print(f"WARNING: Camera {i} has no image_path")
                 dummy_rgb = torch.zeros((self.H, self.W, 3), dtype=torch.float32)
                 rgbs_list.append(dummy_rgb)
         
         if rgbs_list:
-            return torch.stack(rgbs_list)
+            stacked = torch.stack(rgbs_list)
+            return stacked
         return None
 
     def num_images(self):
@@ -104,7 +112,6 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
         return 2.0 / max(self.H, self.W) * 2 / math.sqrt(12)
 
     def get_intrinsics(self, idx: int):
-        camera = self.cameras[idx]
         return {
             "focal_x": self.focal_x,
             "focal_y": self.focal_y,
@@ -128,13 +135,9 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
 
 
 class RayNeRFDataset(BaseNeRFDataset):
-    def __init__(self,json_path: str,data_root: Optional[str] = None,cam_id: bool = False,split: str = "train",device: str = "cpu",dtype: torch.dtype = torch.float32,
+    def __init__(self, json_path: str, data_root: Optional[str] = None, cam_id: bool = False, split: str = "train", device: str = "cpu", dtype: torch.dtype = torch.float32,
                  near: Optional[float] = None, far: Optional[float] = None):
-        super().__init__(json_path, data_root, cam_id, split)
-        self.device = device
-        self.dtype = dtype
-        self.near = near
-        self.far = far
+        super().__init__(json_path, data_root, cam_id, split, device, dtype, near, far)
         self._precompute_rays()
 
     def _precompute_rays(self):
@@ -160,10 +163,10 @@ class RayNeRFDataset(BaseNeRFDataset):
 
         self.all_rays = torch.stack([self.rays_o, self.rays_d], dim=1)
 
-    def get_rays(self, idx: int)-> Tuple[torch.Tensor, torch.Tensor]:
+    def get_rays(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         return self.rays_o[idx], self.rays_d[idx]
 
-    def __getitem__(self, idx: int)-> dict:
+    def __getitem__(self, idx: int) -> dict:
         if self.split == "train":
             img_idx = idx // (self.H * self.W)
             pix_idx = idx % (self.H * self.W)
@@ -176,9 +179,9 @@ class RayNeRFDataset(BaseNeRFDataset):
 
             rays = torch.stack([rays_o, rays_d], dim=0)
 
-            target = None
+            target = torch.zeros(3, dtype=self.dtype)
             if self.rgbs is not None:
-                target = self.rgbs[img_idx, y, x]
+                target = self.rgbs[img_idx, y, x].to(self.dtype)
 
             sample = {"rays": rays, "target_s": target}
 
@@ -193,42 +196,63 @@ class RayNeRFDataset(BaseNeRFDataset):
             sample = {"rays": self.all_rays[img_idx]}
 
             if self.rgbs is not None:
-                sample["target_s"] = self.rgbs[img_idx]
+                sample["target_s"] = self.rgbs[img_idx].to(self.dtype)
+            else:
+                sample["target_s"] = torch.zeros((self.H, self.W, 3), dtype=self.dtype)
 
             if self.has_cam_id:
                 sample["cam_id"] = self.cam_ids[img_idx]
 
             return sample
 
-    def get_full_batch(self, batch_size: int)-> dict:
+    def get_full_batch(self, batch_size: int) -> dict:
         indices = torch.randint(0, len(self), (batch_size,))
-        batch = [self[int(i.item())] for i in indices]
-
-        rays = torch.stack([item["rays"] for item in batch], dim=0)
-
-        if self.rgbs is not None:
-            targets = torch.stack([item["target_s"] for item in batch], dim=0)
+        
+        if self.split == "train":
+            img_indices = indices // (self.H * self.W)
+            pix_indices = indices % (self.H * self.W)
+            y_coords = pix_indices // self.W
+            x_coords = pix_indices % self.W
+            
+            rays_o = self.rays_o[img_indices, y_coords, x_coords]
+            rays_d = self.rays_d[img_indices, y_coords, x_coords]
+            rays = torch.stack([rays_o, rays_d], dim=1)
+            
+            if self.rgbs is not None:
+                targets = self.rgbs[img_indices, y_coords, x_coords]
+            else:
+                targets = torch.zeros((batch_size, 3), dtype=self.dtype)
+            
+            result = {"rays": rays, "target_s": targets}
+            
+            if self.has_cam_id:
+                result["cam_id"] = img_indices
+            
+            return result
         else:
-            targets = None
+            batch = [self[int(i.item())] for i in indices]
+            rays = torch.stack([item["rays"] for item in batch], dim=0)
+            targets = torch.stack([item["target_s"] for item in batch], dim=0)
+            
+            result = {"rays": rays, "target_s": targets}
+            
+            if self.has_cam_id:
+                cam_ids = torch.stack([item["cam_id"] for item in batch], dim=0)
+                result["cam_id"] = cam_ids
+            
+            return result
 
-        result = {"rays": rays}
-        if targets is not None:
-            result["target_s"] = targets
 
-        if self.has_cam_id:
-            cam_ids = torch.stack([item["cam_id"] for item in batch], dim=0)
-            result["cam_id"] = cam_ids
-
-        return result
-
-
-def create_nerf_datasets(json_path: str, train_data_root: Optional[str] = None, val_data_root: Optional[str] = None,cam_id: bool = False,device: str = "cpu")-> Tuple[RayNeRFDataset, RayNeRFDataset]:
+def create_nerf_datasets(json_path: str, train_data_root: Optional[str] = None, val_data_root: Optional[str] = None, cam_id: bool = False, device: str = "cpu",
+                         near: Optional[float] = None, far: Optional[float] = None) -> Tuple[RayNeRFDataset, RayNeRFDataset]:
     train_dataset = RayNeRFDataset(
         json_path=json_path,
         data_root=train_data_root,
         cam_id=cam_id,
         split="train",
         device=device,
+        near=near,
+        far=far,
     )
 
     val_dataset = RayNeRFDataset(
@@ -237,6 +261,8 @@ def create_nerf_datasets(json_path: str, train_data_root: Optional[str] = None, 
         cam_id=cam_id,
         split="val",
         device=device,
+        near=near,
+        far=far,
     )
 
     return train_dataset, val_dataset
