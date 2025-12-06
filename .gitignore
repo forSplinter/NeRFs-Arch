@@ -235,6 +235,6 @@ raw/
 processed/
 dataset/
 dataset/logs/
-logs/
 mlartifacts/
 mlruns/
+mlflow.db
