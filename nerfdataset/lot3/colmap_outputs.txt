@@ -1,0 +1,633 @@
+==============================================================================
+Feature extraction
+==============================================================================
+Processed file [1/105]
+  Name:            .DS_Store
+E: ore BITMAP_ERROR: Failed to read the image file format.
+
+Processed file [2/105]
+  Name:            IMG_0451.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #6 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        8848 (SIFT)
+Processed file [3/105]
+  Name:            IMG_0446.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #1 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        8852 (SIFT)
+Processed file [4/105]
+  Name:            IMG_0448.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #3 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9425 (SIFT)
+Processed file [5/105]
+  Name:            IMG_0447.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #2 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9949 (SIFT)
+Processed file [6/105]
+  Name:            IMG_0449.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #4 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10291 (SIFT)
+Processed file [7/105]
+  Name:            IMG_0450.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #5 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9324 (SIFT)
+Processed file [8/105]
+  Name:            IMG_0454.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #9 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10821 (SIFT)
+Processed file [9/105]
+  Name:            IMG_0452.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #7 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11166 (SIFT)
+Processed file [10/105]
+  Name:            IMG_0453.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #8 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10956 (SIFT)
+Processed file [11/105]
+  Name:            IMG_0455.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #10 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12642 (SIFT)
+Processed file [12/105]
+  Name:            IMG_0461.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #16 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10452 (SIFT)
+Processed file [13/105]
+  Name:            IMG_0457.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #12 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12129 (SIFT)
+Processed file [14/105]
+  Name:            IMG_0460.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #15 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11016 (SIFT)
+Processed file [15/105]
+  Name:            IMG_0456.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #11 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11541 (SIFT)
+Processed file [16/105]
+  Name:            IMG_0458.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #13 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11857 (SIFT)
+Processed file [17/105]
+  Name:            IMG_0459.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #14 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12479 (SIFT)
+Processed file [18/105]
+  Name:            IMG_0462.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #17 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11390 (SIFT)
+Processed file [19/105]
+  Name:            IMG_0463.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #18 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10384 (SIFT)
+Processed file [20/105]
+  Name:            IMG_0465.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #20 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9974 (SIFT)
+Processed file [21/105]
+  Name:            IMG_0464.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #19 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11359 (SIFT)
+Processed file [22/105]
+  Name:            IMG_0466.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #21 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9864 (SIFT)
+Processed file [23/105]
+  Name:            IMG_0472.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #27 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10872 (SIFT)
+Processed file [24/105]
+  Name:            IMG_0467.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #22 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11310 (SIFT)
+Processed file [25/105]
+  Name:            IMG_0473.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #28 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11776 (SIFT)
+Processed file [26/105]
+  Name:            IMG_0475.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #30 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9827 (SIFT)
+Processed file [27/105]
+  Name:            IMG_0468.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #23 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11053 (SIFT)
+Processed file [28/105]
+  Name:            IMG_0474.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #29 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9942 (SIFT)
+Processed file [29/105]
+  Name:            IMG_0470.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #25 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12590 (SIFT)
+Processed file [30/105]
+  Name:            IMG_0471.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #26 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11195 (SIFT)
+Processed file [31/105]
+  Name:            IMG_0469.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #24 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11791 (SIFT)
+Processed file [32/105]
+  Name:            IMG_0480.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #35 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        6894 (SIFT)
+Processed file [33/105]
+  Name:            IMG_0476.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #31 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9138 (SIFT)
+Processed file [34/105]
+  Name:            IMG_0482.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #36 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7516 (SIFT)
+Processed file [35/105]
+  Name:            IMG_0479.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #34 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7966 (SIFT)
+Processed file [36/105]
+  Name:            IMG_0485.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #39 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7793 (SIFT)
+Processed file [37/105]
+  Name:            IMG_0486.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #40 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7160 (SIFT)
+Processed file [38/105]
+  Name:            IMG_0484.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #38 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7576 (SIFT)
+Processed file [39/105]
+  Name:            IMG_0478.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #33 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        8517 (SIFT)
+Processed file [40/105]
+  Name:            IMG_0477.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #32 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        8475 (SIFT)
+Processed file [41/105]
+  Name:            IMG_0483.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #37 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7183 (SIFT)
+Processed file [42/105]
+  Name:            IMG_0487.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #41 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7274 (SIFT)
+Processed file [43/105]
+  Name:            IMG_0488.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #42 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7313 (SIFT)
+Processed file [44/105]
+  Name:            IMG_0489.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #43 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7739 (SIFT)
+Processed file [45/105]
+  Name:            IMG_0493.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #47 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7105 (SIFT)
+Processed file [46/105]
+  Name:            IMG_0492.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #46 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7307 (SIFT)
+Processed file [47/105]
+  Name:            IMG_0490.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #44 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7973 (SIFT)
+Processed file [48/105]
+  Name:            IMG_0495.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #49 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7304 (SIFT)
+Processed file [49/105]
+  Name:            IMG_0494.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #48 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        6880 (SIFT)
+Processed file [50/105]
+  Name:            IMG_0491.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #45 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        8376 (SIFT)
+Processed file [51/105]
+  Name:            IMG_0496.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #50 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9299 (SIFT)
+Processed file [52/105]
+  Name:            IMG_0497.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #51 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        8401 (SIFT)
+Processed file [53/105]
+  Name:            IMG_0499.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #53 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7985 (SIFT)
+Processed file [54/105]
+  Name:            IMG_0498.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #52 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7738 (SIFT)
+Processed file [55/105]
+  Name:            IMG_0500.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #54 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        7768 (SIFT)
+Processed file [56/105]
+  Name:            IMG_0505.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #59 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        13869 (SIFT)
+Processed file [57/105]
+  Name:            IMG_0504.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #58 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        14853 (SIFT)
+Processed file [58/105]
+  Name:            IMG_0506.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #60 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12948 (SIFT)
+Processed file [59/105]
+  Name:            IMG_0502.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #56 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10586 (SIFT)
+Processed file [60/105]
+  Name:            IMG_0503.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #57 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10023 (SIFT)
+Processed file [61/105]
+  Name:            IMG_0501.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #55 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12090 (SIFT)
+Processed file [62/105]
+  Name:            IMG_0508.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #62 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11849 (SIFT)
+Processed file [63/105]
+  Name:            IMG_0507.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #61 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11685 (SIFT)
+Processed file [64/105]
+  Name:            IMG_0509.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #63 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12814 (SIFT)
+Processed file [65/105]
+  Name:            IMG_0510.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #64 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        15005 (SIFT)
+Processed file [66/105]
+  Name:            IMG_0511.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #65 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12703 (SIFT)
+Processed file [67/105]
+  Name:            IMG_0512.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #66 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        13986 (SIFT)
+Processed file [68/105]
+  Name:            IMG_0513.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #67 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        15947 (SIFT)
+Processed file [69/105]
+  Name:            IMG_0515.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #69 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        15102 (SIFT)
+Processed file [70/105]
+  Name:            IMG_0516.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #70 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        13013 (SIFT)
+Processed file [71/105]
+  Name:            IMG_0514.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #68 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        16462 (SIFT)
+Processed file [72/105]
+  Name:            IMG_0517.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #71 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11802 (SIFT)
+Processed file [73/105]
+  Name:            IMG_0518.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #72 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12053 (SIFT)
+Processed file [74/105]
+  Name:            IMG_0520.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #74 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10036 (SIFT)
+Processed file [75/105]
+  Name:            IMG_0519.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #73 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10240 (SIFT)
+Processed file [76/105]
+  Name:            IMG_0521.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #75 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9349 (SIFT)
+Processed file [77/105]
+  Name:            IMG_0522.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #76 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        8690 (SIFT)
+Processed file [78/105]
+  Name:            IMG_0523.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #77 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10007 (SIFT)
+Processed file [79/105]
+  Name:            IMG_0526.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #80 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        9199 (SIFT)
+Processed file [80/105]
+  Name:            IMG_0524.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #78 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10697 (SIFT)
+Processed file [81/105]
+  Name:            IMG_0525.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #79 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11189 (SIFT)
+Processed file [82/105]
+  Name:            IMG_0527.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #81 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10363 (SIFT)
+Processed file [83/105]
+  Name:            IMG_0530.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #82 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        13742 (SIFT)
+Processed file [84/105]
+  Name:            IMG_0531.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #83 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        15567 (SIFT)
+Processed file [85/105]
+  Name:            IMG_0532.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #84 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10589 (SIFT)
+Processed file [86/105]
+  Name:            IMG_0533.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #85 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10525 (SIFT)
+Processed file [87/105]
+  Name:            IMG_0534.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #86 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11216 (SIFT)
+Processed file [88/105]
+  Name:            IMG_0538.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #90 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12741 (SIFT)
+Processed file [89/105]
+  Name:            IMG_0537.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #89 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        14694 (SIFT)
+Processed file [90/105]
+  Name:            IMG_0536.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #88 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10108 (SIFT)
+Processed file [91/105]
+  Name:            IMG_0535.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #87 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10831 (SIFT)
+Processed file [92/105]
+  Name:            IMG_0539.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #91 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11151 (SIFT)
+Processed file [93/105]
+  Name:            IMG_0540.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #92 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10058 (SIFT)
+Processed file [94/105]
+  Name:            IMG_0542.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #94 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        16962 (SIFT)
+Processed file [95/105]
+  Name:            IMG_0541.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #93 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10244 (SIFT)
+Processed file [96/105]
+  Name:            IMG_0547.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #99 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        15637 (SIFT)
+Processed file [97/105]
+  Name:            IMG_0546.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #98 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        15588 (SIFT)
+Processed file [98/105]
+  Name:            IMG_0545.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #97 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        10614 (SIFT)
+Processed file [99/105]
+  Name:            IMG_0544.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #96 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12667 (SIFT)
+Processed file [100/105]
+  Name:            IMG_0543.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #95 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        13446 (SIFT)
+Processed file [101/105]
+  Name:            IMG_0548.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #100 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        14364 (SIFT)
+Processed file [102/105]
+  Name:            IMG_0549.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #101 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        13294 (SIFT)
+Processed file [103/105]
+  Name:            IMG_0550.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #102 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        12957 (SIFT)
+Processed file [104/105]
+  Name:            IMG_0551.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #103 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11931 (SIFT)
+Processed file [105/105]
+  Name:            IMG_0552.JPG
+  Dimensions:      1023 x 1365
+  Camera:          #104 - SIMPLE_RADIAL
+  Focal Length:    1638.00px
+  Features:        11021 (SIFT)
+Elapsed time: 0.272 [minutes]
+
