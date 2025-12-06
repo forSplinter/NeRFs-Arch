@@ -3,7 +3,6 @@ import argparse
 import yaml
 import torch
 import mlflow
-import shutil
 from datetime import datetime
 from evaluation.trainer import train
 from evaluation.evaluate import Eval
@@ -21,13 +20,11 @@ def parse_args():
     return parser.parse_args()
 
 def load_config(config_path):
-    """Load YAML config file"""
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
     return config
 
 def flatten_config_for_logging(config, prefix=''):
-    """Flatten nested config for MLflow parameter logging"""
     items = {}
     for key, value in config.items():
         if isinstance(value, dict):
@@ -41,7 +38,6 @@ def flatten_config_for_logging(config, prefix=''):
     return items
 
 def setup_mlflow(config, exp_dir, args):
-    """Setup MLflow tracking"""
     mlflow_uri = config.get('mlflow_uri', 'file:./mlruns')
     mlflow.set_tracking_uri(mlflow_uri)
     
@@ -54,14 +50,11 @@ def setup_mlflow(config, exp_dir, args):
     
     mlflow.start_run(run_name=run_name)
     
-    # Log flattened config
     flat_config = flatten_config_for_logging(config)
     mlflow.log_params(flat_config)
     
-    # Log config file
     mlflow.log_artifact(args.config)
     
-    # Log saved config
     saved_config = exp_dir / 'config.yaml'
     if saved_config.exists():
         mlflow.log_artifact(saved_config)
@@ -74,7 +67,6 @@ def setup_mlflow(config, exp_dir, args):
     return mlflow.active_run()
 
 def setup_experiment(config, args, device):
-    """Setup experiment directory"""
     exp_name = config['experiment_name']
     basedir = config.get('basedir', './logs')
     exp_dir = Path(basedir) / exp_name
@@ -85,7 +77,6 @@ def setup_experiment(config, args, device):
             raise FileNotFoundError(f"Experiment directory {exp_dir} does not exist for evaluation.")
         exp_dir.mkdir(parents=True, exist_ok=True)
         ckpt_dir.mkdir(parents=True, exist_ok=True)
-        
         
         with open(exp_dir / 'config.yaml', 'w') as f:
             yaml.dump(config, f, default_flow_style=False)
@@ -105,25 +96,30 @@ def setup_experiment(config, args, device):
     return exp_dir, resume_from
 
 def run_training(config, exp_dir, resume_from, device, args):
-    """Run training"""
-    
-    # Get data paths
     data_config = config.get('data', {})
     data_path = data_config.get('train_path')
     if not data_path:
         raise ValueError("train_path must be specified in config data section")
     
-    test_data_path = data_config.get('val_path') or data_config.get('test_path')
-    if not test_data_path:
-        # Try to infer
-        train_path = Path(data_path)
-        if 'train' in train_path.name:
-            test_data_path = str(train_path.parent / train_path.name.replace('train', 'test'))
-            print(f"Inferred test_data_path: {test_data_path}")
-        else:
-            test_data_path = data_path
+    use_full_dataset = data_config.get('use_full_dataset', False)
     
-    # Get model config
+    if use_full_dataset:
+        test_data_path = None
+        print("Training on FULL dataset (no train/test split)")
+    else:
+        test_data_path = data_config.get('val_path') or data_config.get('test_path')
+        if not test_data_path:
+            train_path = Path(data_path)
+            if 'train' in train_path.name:
+                test_data_path = str(train_path.parent / train_path.name.replace('train', 'test'))
+                print(f"Inferred test_data_path: {test_data_path}")
+            else:
+                test_data_path = data_path
+    
+    near = data_config.get('near', 0.1)
+    far = data_config.get('far', 6.0)
+    print(f"Using near={near}, far={far}")
+    
     model_config = config.get('model', {})
     model_kwargs = {
         'net_depth': model_config.get('net_depth', 8),
@@ -144,15 +140,12 @@ def run_training(config, exp_dir, resume_from, device, args):
         'use_hierarchical': model_config.get('use_hierarchical', True)
     }
     
-    # Get training config
     train_config = config.get('training', {})
     
-    # Adjust for debug mode
     if args.debug:
         train_config['max_steps'] = 1000
         train_config['i_testset'] = 500
     
-    # Call train function
     train(
         model_type=model_config.get('type', 'mipnerf'),
         data_path=data_path,
@@ -171,11 +164,12 @@ def run_training(config, exp_dir, resume_from, device, args):
         resume_from=resume_from,
         use_tensorboard=train_config.get('use_tensorboard', True),
         use_mlflow=args.mlflow,
+        near=near,
+        far=far,
         **model_kwargs
     )
 
 def run_evaluation(config, exp_dir, device, resume_path):
-    """Run evaluation"""
     print("EVALUATION MODE")
     
     ckpt_dir = exp_dir / 'checkpoints'
@@ -194,7 +188,6 @@ def run_evaluation(config, exp_dir, device, resume_path):
 
     print(f"Loading checkpoint: {ckpt_path}")
     
-    # Get model config
     model_config = config.get('model', {})
     data_config = config.get('data', {})
     
@@ -224,19 +217,29 @@ def run_evaluation(config, exp_dir, device, resume_path):
     
     print(f"Evaluating checkpoint at step {step}")
     
-    # Get test data path
-    test_data_path = data_config.get('test_path') or data_config.get('val_path')
-    if not test_data_path:
-        train_path = data_config.get('train_path', '')
-        if 'train' in train_path:
-            test_data_path = train_path.replace('train', 'test')
-        else:
-            test_data_path = data_config.get('train_path')
+    near = data_config.get('near', 0.1)
+    far = data_config.get('far', 6.0)
+    
+    use_full_dataset = data_config.get('use_full_dataset', False)
+    
+    if use_full_dataset:
+        test_data_path = data_config.get('train_path')
+        print("Evaluating on full dataset")
+    else:
+        test_data_path = data_config.get('test_path') or data_config.get('val_path')
+        if not test_data_path:
+            train_path = data_config.get('train_path', '')
+            if 'train' in train_path:
+                test_data_path = train_path.replace('train', 'test')
+            else:
+                test_data_path = data_config.get('train_path')
     
     test_dataset = RayNeRFDataset(
         json_path=test_data_path,
         split='val',
-        device=device
+        device=device,
+        near=near,
+        far=far
     )
     
     eval_config = config.get('evaluation', {})
@@ -262,17 +265,13 @@ def run_evaluation(config, exp_dir, device, resume_path):
 def main():
     args = parse_args()
     
-    # Load config
     config = load_config(args.config)
     
-    # Set device
     device = args.device or ('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
     
-    # Setup experiment
     exp_dir, resume_from = setup_experiment(config, args, device)
     
-    # Setup MLflow if enabled for training
     if args.mlflow and not args.eval:
         mlflow_run = setup_mlflow(config, exp_dir, args)
     
@@ -280,7 +279,6 @@ def main():
         if args.eval:
             results = run_evaluation(config, exp_dir, device, args.resume or resume_from)
             
-            # Log evaluation to MLflow if enabled
             if args.mlflow:
                 mlflow_uri = config.get('mlflow_uri', 'file:./mlruns')
                 mlflow.set_tracking_uri(mlflow_uri)

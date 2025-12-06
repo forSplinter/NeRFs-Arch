@@ -1,5 +1,3 @@
-# evaluation/trainer.py (version améliorée)
-
 import time
 import torch
 import torch.optim as optim
@@ -19,7 +17,6 @@ def train_one_step_with_logging(batch: dict, model: torch.nn.Module, optimizer: 
                                scheduler: Optional[torch.optim.lr_scheduler.LRScheduler],
                                near: float, far: float, radii: float, device: str, 
                                step: int, use_mlflow: bool) -> dict:
-    """Train one step with MLflow logging"""
     model.train()
     optimizer.zero_grad()
     
@@ -35,8 +32,9 @@ def train_one_step_with_logging(batch: dict, model: torch.nn.Module, optimizer: 
     
     ret_dict = model(rays_o, rays_d, bounds, radii_tensor)
     target = batch['target_s'].to(device)
-    if step % 100 == 0 or step < 5:  # Print les 5 premiers steps et chaque 100
-        print(f"\n🔍 Debug step {step}:")
+    
+    if step % 100 == 0 or step < 5:
+        print(f"\n Debug step {step}:")
         print(f"  rgb range: [{ret_dict['rgb'].min().item():.3f}, {ret_dict['rgb'].max().item():.3f}]")
         print(f"  target range: [{target.min().item():.3f}, {target.max().item():.3f}]")
         print(f"  rgb mean: {ret_dict['rgb'].mean().item():.3f}")
@@ -56,7 +54,6 @@ def train_one_step_with_logging(batch: dict, model: torch.nn.Module, optimizer: 
     
     psnr = mse2psnr(loss).item()
     
-    # Log metrics to MLflow
     if use_mlflow:
         mlflow.log_metrics({
             'train_loss': loss.item(),
@@ -67,16 +64,7 @@ def train_one_step_with_logging(batch: dict, model: torch.nn.Module, optimizer: 
     return {'loss': loss.item(), 'psnr': psnr}
 
 def save_checkpoint(path: str, step: int, model: torch.nn.Module, optimizer: torch.optim.Optimizer,
-                    scheduler: Optional[torch.optim.lr_scheduler.LRScheduler] = None)-> None:
-    """_summary_
-
-    Args:
-        path (str): _description_
-        step (int): _description_
-        model (torch.nn.Module): _description_
-        optimizer (torch.optim.Optimizer): _description_
-        scheduler (Optional[torch.optim.lr_scheduler._LRScheduler], optional): _description_. Defaults to None.
-    """
+                    scheduler: Optional[torch.optim.lr_scheduler.LRScheduler] = None) -> None:
     checkpoint = {
         'step': step,
         'model': model.state_dict(),
@@ -88,18 +76,6 @@ def save_checkpoint(path: str, step: int, model: torch.nn.Module, optimizer: tor
 
 def load_checkpoint(path: str, model: torch.nn.Module, optimizer: torch.optim.Optimizer, device: str, 
                     scheduler: Optional[torch.optim.lr_scheduler._LRScheduler] = None) -> int:
-    """_summary_
-
-    Args:
-        path (str): _description_
-        model (torch.nn.Module): _description_
-        optimizer (torch.optim.Optimizer): _description_
-        device (str): _description_
-        scheduler (Optional[torch.optim.lr_scheduler._LRScheduler], optional): _description_. Defaults to None.
-
-    Returns:
-        int: _description_
-    """
     checkpoint = torch.load(path, map_location=device)
     model.load_state_dict(checkpoint['model'])
     optimizer.load_state_dict(checkpoint['optimizer'])
@@ -109,23 +85,12 @@ def load_checkpoint(path: str, model: torch.nn.Module, optimizer: torch.optim.Op
     return checkpoint['step']
 
 def create_scheduler(lr: float, optimizer: torch.optim.Optimizer, lr_decay_steps: int, lr_decay_rate: float,
-                     lr_warmup_init: float, lr_warmup_steps: int, max_steps: int)-> LambdaLR:
-    """_summary_
-
-    Args:
-        optimizer (torch.optim.Optimizer): _description_
-        lr_decay_steps (int): _description_
-        lr_decay_rate (float): _description_
-        lr_warmup_init (float): _description_
-        lr_warmup_steps (int): _description_
-        max_steps (int): _description_
-    """
+                     lr_warmup_init: float, lr_warmup_steps: int, max_steps: int) -> LambdaLR:
     def lr_lambda(step):
         if step < lr_warmup_steps:
             warmup_factor = step / lr_warmup_steps
             lr_scale = lr_warmup_init + (lr - lr_warmup_init) * warmup_factor
             return lr_scale / lr
-        
         else:
             decay_step = (step - lr_warmup_steps) // lr_decay_steps
             decay_factor = lr_decay_rate ** decay_step
@@ -134,18 +99,10 @@ def create_scheduler(lr: float, optimizer: torch.optim.Optimizer, lr_decay_steps
     return LambdaLR(optimizer, lr_lambda)
 
 def current_lr(optimizer: torch.optim.Optimizer) -> float:
-    """_summary_
-
-    Args:
-        optimizer (torch.optim.Optimizer): _description_
-
-    Returns:
-        float: _description_
-    """
     return optimizer.param_groups[0]['lr']   
 
-def log_sample_image(model, dataset, idx, step, device, use_mlflow):
-    if not use_mlflow:
+def log_sample_image(model, dataset, idx, step, device, near, far, use_mlflow):
+    if not use_mlflow or dataset is None:
         return
     
     try:
@@ -162,7 +119,7 @@ def log_sample_image(model, dataset, idx, step, device, use_mlflow):
                 rays_o = rays[:, 0].reshape(-1, 3).to(device)
                 rays_d = rays[:, 1].reshape(-1, 3).to(device)
             
-            bounds = torch.tensor([[dataset.near, dataset.far]], device=device).expand(rays_o.shape[0], 2)
+            bounds = torch.tensor([[near, far]], device=device).expand(rays_o.shape[0], 2)
             radii = torch.full((rays_o.shape[0],), dataset.radii(), device=device)
             
             chunk_size = 32768 
@@ -179,7 +136,6 @@ def log_sample_image(model, dataset, idx, step, device, use_mlflow):
                 all_rgb.append(rgb_chunk)
             
             rgb = torch.cat(all_rgb, dim=0)
-            
             rgb = rgb.reshape(H, W, 3)
             rgb_np = (rgb.cpu().numpy() * 255).astype(np.uint8)
             img = Image.fromarray(rgb_np)
@@ -198,7 +154,7 @@ def log_sample_image(model, dataset, idx, step, device, use_mlflow):
 def train(
     model_type: str = 'mipnerf',
     data_path: str = 'data/transforms_train.json',
-    test_data_path: str = 'data/transforms_test.json',
+    test_data_path: Optional[str] = None,
     run_dir = None,
     batch_size: int = 1024,
     max_steps: int = 200000,
@@ -215,6 +171,8 @@ def train(
     lr_decay_rate: float = 0.1,
     lr_warmup_steps: int = 2000,
     lr_warmup_init: float = 1e-5,
+    near: float = 0.887,
+    far: float = 13.702,
     **model_kwargs
 ):
     if isinstance(lr, str):
@@ -235,10 +193,17 @@ def train(
     run_dir = Path(run_dir) if run_dir else Path('runs/exp1')
     (run_dir / 'checkpoints').mkdir(exist_ok=True, parents=True)
     
-    train_dataset = RayNeRFDataset(json_path=data_path, split='train', device=device, near=2.0, far=8.0)
-    test_dataset = RayNeRFDataset(json_path=test_data_path, split='val', device=device, near=2.0, far=8.0)
+    print(f"Using near={near}, far={far}")
     
-    near, far = train_dataset.near, train_dataset.far
+    train_dataset = RayNeRFDataset(json_path=data_path, split='train', device=device, near=near, far=far)
+    
+    if test_data_path is not None:
+        test_dataset = RayNeRFDataset(json_path=test_data_path, split='val', device=device, near=near, far=far)
+        print(f"Loaded test dataset: {test_data_path}")
+    else:
+        test_dataset = None
+        print("No test dataset (training on full dataset)")
+    
     radii = train_dataset.radii()
     
     model = MipNeRF(**mipnerf_kwargs)
@@ -268,53 +233,45 @@ def train(
     print(f"MLflow logging: {use_mlflow}")
     
     time0 = time.time()
-    metrics = {'loss': 0.0, 'psnr': 0.0}  # Initialize metrics
+    metrics = {'loss': 0.0, 'psnr': 0.0}
     
-    # Log initial sample
-    if use_mlflow and step> 0:
-        log_sample_image(model, test_dataset, log_img_idx, step, device, use_mlflow)
+    if use_mlflow and step > 0 and test_dataset is not None:
+        log_sample_image(model, test_dataset, log_img_idx, step, device, near, far, use_mlflow)
     
     while step < max_steps:
         step += 1
         
-        # Get batch
         batch = train_dataset.get_full_batch(batch_size)
         
-        # Train step
         metrics = train_one_step_with_logging(
             batch, model, optimizer, scheduler, near, far, radii, device, step, use_mlflow
         )
         
-        # Print progress
         if step % i_print == 0:
             dt = time.time() - time0
             time0 = time.time()
             print(f"[{step}/{max_steps}] Loss: {metrics['loss']:.4f} "
                   f"PSNR: {metrics['psnr']:.2f} Time: {dt/i_print:.3f}s")
             
-            # Log additional metrics
             if use_mlflow:
                 mlflow.log_metric('iter_time', dt/i_print, step=step)
         
-        # Save checkpoint
         if step % i_weights == 0:
             path = run_dir / 'checkpoints' / f'{step:08d}.ckpt'
             save_checkpoint(str(path), step, model, optimizer, scheduler)
             print(f"Saved: {path}")
             
-            # Log checkpoint to MLflow occasionally
             if use_mlflow:
                 mlflow.log_artifact(str(path), "checkpoints")
                 mlflow.log_metric('final_step', step)
                 mlflow.log_metric('final_loss', metrics['loss'])
                 mlflow.log_metric('final_psnr', metrics['psnr'])
         
-        # Evaluate and log images
         if step % i_testset == 0:
             print(f"Evaluating at step {step}...")
             
-            if use_mlflow:
-                log_sample_image(model, test_dataset, log_img_idx, step, device, use_mlflow)
+            if use_mlflow and test_dataset is not None:
+                log_sample_image(model, test_dataset, log_img_idx, step, device, near, far, use_mlflow)
                 model.eval()
                 with torch.no_grad():
                     eval_batch = test_dataset.get_full_batch(min(100, batch_size))
@@ -342,6 +299,35 @@ def train(
                         }, step=step)
                         
                         print(f"  Eval PSNR: {eval_psnr:.2f}")
+            elif test_dataset is None:
+                eval_batch = train_dataset.get_full_batch(min(100, batch_size))
+                eval_rays = eval_batch['rays']
+                
+                if eval_rays.shape[0] == 2:
+                    rays_o, rays_d = eval_rays[0].to(device), eval_rays[1].to(device)
+                else:
+                    rays_o, rays_d = eval_rays[:, 0].to(device), eval_rays[:, 1].to(device)
+                
+                model.eval()
+                with torch.no_grad():
+                    bounds = torch.tensor([[near, far]], device=device).expand(rays_o.shape[0], 2)
+                    radii_tensor = torch.full((rays_o.shape[0],), radii, device=device)
+                    
+                    outputs = model(rays_o, rays_d, bounds, radii_tensor)
+                    rgb = outputs.get('rgb', outputs.get('rgb0'))
+                    
+                    if 'target_s' in eval_batch:
+                        target = eval_batch['target_s'].to(device)
+                        eval_loss = img2mse(rgb, target).item()
+                        eval_psnr = mse2psnr(eval_loss).item()
+                        
+                        if use_mlflow:
+                            mlflow.log_metrics({
+                                'eval_loss': eval_loss,
+                                'eval_psnr': eval_psnr
+                            }, step=step)
+                        
+                        print(f"  Train Eval PSNR: {eval_psnr:.2f}")
     
     final_path = run_dir / 'checkpoints' / 'final.ckpt'
     save_checkpoint(str(final_path), step, model, optimizer, scheduler)
@@ -349,10 +335,8 @@ def train(
     if use_mlflow:
         mlflow.log_artifact(str(final_path), "checkpoints")
         mlflow.log_metric('final_step', step)
-        if use_mlflow:
-            mlflow.log_artifact(str(final_path), "checkpoints")
-            mlflow.log_metric('final_step', step)
-            mlflow.log_metric('final_loss', metrics['loss'])
-            mlflow.log_metric('final_psnr', metrics['psnr'])    
+        mlflow.log_metric('final_loss', metrics['loss'])
+        mlflow.log_metric('final_psnr', metrics['psnr'])
+    
     print("Training complete!")
     print(f"Final checkpoint: {final_path}")
