@@ -88,14 +88,11 @@ def create_scheduler(lr: float, optimizer: torch.optim.Optimizer, lr_decay_steps
                      lr_warmup_init: float, lr_warmup_steps: int, max_steps: int) -> LambdaLR:
     def lr_lambda(step):
         if step < lr_warmup_steps:
-            warmup_factor = step / lr_warmup_steps
-            lr_scale = lr_warmup_init + (lr - lr_warmup_init) * warmup_factor
-            return lr_scale / lr
+            return lr_warmup_init / lr + (1 - lr_warmup_init / lr) * (step / lr_warmup_steps)
         else:
-            decay_step = (step - lr_warmup_steps) // lr_decay_steps
-            decay_factor = lr_decay_rate ** decay_step
-            return decay_factor
-    
+            progress = (step - lr_warmup_steps) / (max_steps - lr_warmup_steps)
+            return lr_decay_rate ** progress    
+
     return LambdaLR(optimizer, lr_lambda)
 
 def current_lr(optimizer: torch.optim.Optimizer) -> float:
