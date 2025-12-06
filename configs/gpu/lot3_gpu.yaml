@@ -1,4 +1,4 @@
-experiment_name: lot3_4x3090
+experiment_name: lot3_4x3090_v2
 dataset: lot3
 mlflow_uri: "http://0.0.0.0:8080"
 data:
@@ -12,7 +12,7 @@ model:
   net_depth: 8
   net_width: 256
   net_depth_fine: 8
-  net_width_fine: 256
+  net_width_fine: 256      
   N_samples:  64         
   N_importance:  128        
   use_viewdirs: true
