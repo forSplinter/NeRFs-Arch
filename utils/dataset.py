@@ -137,7 +137,9 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
 class RayNeRFDataset(BaseNeRFDataset):
     def __init__(self, json_path: str, data_root: Optional[str] = None, cam_id: bool = False, split: str = "train", device: str = "cpu", dtype: torch.dtype = torch.float32,
                  near: Optional[float] = None, far: Optional[float] = None):
-        super().__init__(json_path, data_root, cam_id, split, device, dtype, near, far)
+        # Force CPU pour le stockage, on transfère au GPU par batch
+        self.target_device = device
+        super().__init__(json_path, data_root, cam_id, split, 'cpu', dtype, near, far)
         self._precompute_rays()
 
     def _precompute_rays(self):
@@ -146,11 +148,10 @@ class RayNeRFDataset(BaseNeRFDataset):
 
         for i, camera in enumerate(self.cameras):
             origin, direction = camera.rays(
-                self.H, self.W, device=self.device, dtype=self.dtype
+                self.H, self.W, device='cpu', dtype=self.dtype
             )
-
-            rays_o_list.append(origin.cpu().numpy())
-            rays_d_list.append(direction.cpu().numpy())
+            rays_o_list.append(origin.numpy())
+            rays_d_list.append(direction.numpy())
 
         rays_o = np.stack(rays_o_list, axis=0)
         rays_d = np.stack(rays_d_list, axis=0)
@@ -158,52 +159,10 @@ class RayNeRFDataset(BaseNeRFDataset):
         rays_o = rays_o.reshape(self.image_count, self.H, self.W, 3)
         rays_d = rays_d.reshape(self.image_count, self.H, self.W, 3)
 
-        self.rays_o = torch.from_numpy(rays_o).to(self.device, self.dtype)
-        self.rays_d = torch.from_numpy(rays_d).to(self.device, self.dtype)
-
+        # Stocke sur CPU
+        self.rays_o = torch.from_numpy(rays_o).to(dtype=self.dtype)
+        self.rays_d = torch.from_numpy(rays_d).to(dtype=self.dtype)
         self.all_rays = torch.stack([self.rays_o, self.rays_d], dim=1)
-
-    def get_rays(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
-        return self.rays_o[idx], self.rays_d[idx]
-
-    def __getitem__(self, idx: int) -> dict:
-        if self.split == "train":
-            img_idx = idx // (self.H * self.W)
-            pix_idx = idx % (self.H * self.W)
-
-            y = pix_idx // self.W
-            x = pix_idx % self.W
-
-            rays_o = self.rays_o[img_idx, y, x]
-            rays_d = self.rays_d[img_idx, y, x]
-
-            rays = torch.stack([rays_o, rays_d], dim=0)
-
-            target = torch.zeros(3, dtype=self.dtype)
-            if self.rgbs is not None:
-                target = self.rgbs[img_idx, y, x].to(self.dtype)
-
-            sample = {"rays": rays, "target_s": target}
-
-            if self.has_cam_id:
-                sample["cam_id"] = self.cam_ids[img_idx]
-
-            return sample
-
-        else:
-            img_idx = idx
-
-            sample = {"rays": self.all_rays[img_idx]}
-
-            if self.rgbs is not None:
-                sample["target_s"] = self.rgbs[img_idx].to(self.dtype)
-            else:
-                sample["target_s"] = torch.zeros((self.H, self.W, 3), dtype=self.dtype)
-
-            if self.has_cam_id:
-                sample["cam_id"] = self.cam_ids[img_idx]
-
-            return sample
 
     def get_full_batch(self, batch_size: int) -> dict:
         indices = torch.randint(0, len(self), (batch_size,))
@@ -223,10 +182,14 @@ class RayNeRFDataset(BaseNeRFDataset):
             else:
                 targets = torch.zeros((batch_size, 3), dtype=self.dtype)
             
-            result = {"rays": rays, "target_s": targets}
+            # Transfère au GPU ici
+            result = {
+                "rays": rays.to(self.target_device),
+                "target_s": targets.to(self.target_device)
+            }
             
             if self.has_cam_id:
-                result["cam_id"] = img_indices
+                result["cam_id"] = img_indices.to(self.target_device)
             
             return result
         else:
@@ -234,11 +197,14 @@ class RayNeRFDataset(BaseNeRFDataset):
             rays = torch.stack([item["rays"] for item in batch], dim=0)
             targets = torch.stack([item["target_s"] for item in batch], dim=0)
             
-            result = {"rays": rays, "target_s": targets}
+            result = {
+                "rays": rays.to(self.target_device),
+                "target_s": targets.to(self.target_device)
+            }
             
             if self.has_cam_id:
                 cam_ids = torch.stack([item["cam_id"] for item in batch], dim=0)
-                result["cam_id"] = cam_ids
+                result["cam_id"] = cam_ids.to(self.target_device)
             
             return result
 
