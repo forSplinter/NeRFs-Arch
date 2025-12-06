@@ -1,11 +1,11 @@
-experiment_name: lot1_4x3090
-dataset: lot1
+experiment_name: lot3_4x3090
+dataset: lot3
 mlflow_uri: "http://0.0.0.0:8080"
 data:
-  train_path: "nerfdataset/lot1/transforms_train.json"
-  val_path: "nerfdataset/lot1/transforms_val.json"
-  test_path: "nerfdataset/lot1/transforms_test.json"
-  white_bkgd: true
+  train_path: "nerfdataset/lot3/transforms_train.json"
+  val_path: "nerfdataset/lot3/transforms_val.json"
+  test_path: "nerfdataset/lot3/transforms_test.json"
+  white_bkgd: false 
   near: 2.0 
   far: 8.0
 model:
@@ -20,15 +20,15 @@ model:
   use_embed: true
   multires: 10
   multires_views: 4
-  white_bkgd: true
+  white_bkgd: false
   use_hierarchical: true
   ray_chunk: 4096          
   pts_chunk: 8192           
 training:
   batch_size: 8192         
-  max_steps: 100000          #
-  lr: 5e-4
-  lr_decay_steps: 50000 
+  max_steps: 100000          
+  lr: 3e-4
+  lr_decay_steps: 20000 
   lr_decay_rate: 0.1
   lr_warmup_steps: 2000      
   lr_warmup_init: 1e-5
