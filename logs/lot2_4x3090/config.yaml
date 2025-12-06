@@ -1,0 +1,51 @@
+basedir: ./logs
+data:
+  far: 6.0
+  near: 0.1
+  train_path: nerfdataset/lot2/transforms.json
+  use_full_dataset: true
+  white_bkgd: true
+dataset: lot2
+evaluation:
+  max_val_images: 5
+  metrics:
+  - psnr
+  - ssim
+  - lpips
+  save_comparisons: false
+  save_images: false
+experiment_name: lot2_4x3090
+mlflow_uri: http://0.0.0.0:8080
+model:
+  N_importance: 128
+  N_samples: 64
+  multires: 10
+  multires_views: 4
+  net_depth: 8
+  net_depth_fine: 8
+  net_width: 256
+  net_width_fine: 256
+  pts_chunk: 8192
+  ray_chunk: 4096
+  type: mipnerf
+  use_embed: true
+  use_hierarchical: true
+  use_viewdirs: true
+  white_bkgd: true
+system:
+  benchmark: true
+  deterministic: false
+  device: cuda
+  precision: fp32
+  seed: 42
+training:
+  batch_size: 8192
+  i_print: 100
+  i_testset: 10000
+  i_weights: 5000
+  lr: 5e-4
+  lr_decay_rate: 0.1
+  lr_decay_steps: 50000
+  lr_warmup_init: 1e-5
+  lr_warmup_steps: 2000
+  max_steps: 100000

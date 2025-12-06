@@ -57,6 +57,8 @@ dev = [
     "pre-commit>=3.4.0",
     "pytest>=7.4.0",
     "vastai>=0.2.8",
+    "pillow>=10.0.1",
+    "pillow_heif>=0.7.0",
 ]
 [project.scripts]
 preprocess = "scripts.preprocessing:main"

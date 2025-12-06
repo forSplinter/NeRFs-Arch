@@ -29,8 +29,12 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
         self.focal_y = self.intrinsics.fl_y
 
         self.data = self.dataset_loader.data
-        self.near = near if near is not None else self.data.get("near", 0.1)
-        self.far = far if far is not None else self.data.get("far", 100.0)
+        if near is not None and far is not None:
+            self.near = near
+            self.far = far
+        else:
+            self.near, self.far = self.auto_compute_near_far(self.dataset_loader)
+
         self.aabb_scale = self.data.get("aabb_scale", 16)
 
         self.data_root = data_root if data_root else self.json_dir
@@ -47,7 +51,26 @@ class BaseNeRFDataset(torch.utils.data.Dataset):
 
         if cam_id:
             self.cam_ids = torch.arange(self.image_count, dtype=torch.long)
-
+    def auto_compute_near_far(self, dataset_loader, percentile_low=0.1, percentile_high=99.9, factor_near=0.9, factor_far=1.1):
+        camera_positions = []
+        for cam in dataset_loader.frames:
+        # récupère position de caméra via ton Camera/Extrinsics
+            pos = cam.extrinsics.get_position()  # shape (3,)
+            if isinstance(pos, torch.Tensor):
+                pos = pos.cpu().numpy()
+            camera_positions.append(pos)
+        camera_positions = np.stack(camera_positions) 
+        
+        if "points3D" in dataset_loader.data:
+            points3D = np.array(dataset_loader.data["points3D"])  # [N_pts, 3]
+            dists = np.linalg.norm(points3D[None, :, :] - camera_positions[:, None, :], axis=-1)
+            dists = dists.flatten()
+        else:
+            dists = np.linalg.norm(camera_positions, axis=-1)
+        
+        near = np.percentile(dists, percentile_low) * factor_near
+        far = np.percentile(dists, percentile_high) * factor_far
+        return float(near), float(far)
     def _load_images_from_json(self):
         rgbs_list = []
         
@@ -207,7 +230,6 @@ class RayNeRFDataset(BaseNeRFDataset):
                 result["cam_id"] = cam_ids.to(self.target_device)
             
             return result
-
 
 def create_nerf_datasets(json_path: str, train_data_root: Optional[str] = None, val_data_root: Optional[str] = None, cam_id: bool = False, device: str = "cpu",
                          near: Optional[float] = None, far: Optional[float] = None) -> Tuple[RayNeRFDataset, RayNeRFDataset]:

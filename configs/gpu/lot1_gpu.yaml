@@ -7,8 +7,8 @@ data:
   train_path: "nerfdataset/lot2/transforms.json"
   use_full_dataset: true
   white_bkgd: true
-  near: 0.1
-  far: 6.0
+  near: 0.3
+  far: 13.702
 
 model:
   type: "mipnerf"
@@ -24,16 +24,18 @@ model:
   multires_views: 4
   white_bkgd: true
   use_hierarchical: true
-  ray_chunk: 4096          
-  pts_chunk: 8192           
+  ray_chunk: 2048        
+  pts_chunk: 4096           
 
 training:
-  batch_size: 8192         
+  batch_size: 2048        
   max_steps: 100000
   lr: 5e-4
-  lr_decay_steps: 50000 
+  lr_decay_steps: 200000
   lr_decay_rate: 0.1
   lr_warmup_steps: 2000      
+  multires: 10
+  multires_views: 4
   lr_warmup_init: 1e-5
   i_print: 100
   i_weights: 5000
