@@ -2,40 +2,38 @@ experiment_name: lot3_4x3090_v2
 dataset: lot3
 mlflow_uri: "http://0.0.0.0:8080"
 data:
-  train_path: "nerfdataset/lot3/transforms_train.json"
-  val_path: "nerfdataset/lot3/transforms_val.json"
-  test_path: "nerfdataset/lot3/transforms_test.json"
-  white_bkgd: false 
-  near: 2.0 
-  far: 8.0
+  train_path: "nerfdataset/lot3/transforms.json"
+  white_bkgd: true
+  use_full_dataset: true
+  near: 0.877
+  far: 13.772
 model:
   type: "mipnerf"
   net_depth: 8
   net_width: 256
   net_depth_fine: 8
-  net_width_fine: 256
-  N_samples: 64         
-  N_importance: 128        
+  net_width_fine: 256      
+  N_samples:  64         
+  N_importance:  128        
   use_viewdirs: true
   use_embed: true
   multires: 10
   multires_views: 4
-  white_bkgd: false
+  white_bkgd: true
   use_hierarchical: true
-  ray_chunk: 1024         
+  ray_chunk: 2048        
   pts_chunk: 4096          
 training:
-  batch_size:  1536        
+  batch_size: 2048        
   max_steps: 100000          
-  lr: 3e-4
+  lr: 5e-4
   lr_decay_steps: 50000 
-  lr_decay_rate: 0.5
-  lr_warmup_steps: 1000     
+  lr_decay_rate: 0.1
+  lr_warmup_steps: 2000      
   lr_warmup_init: 1e-5
   i_print: 100
-  i_weights: 10000
-  i_testset: 50000
-  num_workers: 8
+  i_weights: 5000
+  i_testset: 10000
 evaluation:
   save_images: false
   save_comparisons: false
