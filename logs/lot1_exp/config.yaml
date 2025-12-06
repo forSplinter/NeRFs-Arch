@@ -1,52 +1,51 @@
 data:
-  far: 8.0
-  near: 2.0
+  far: 4.0
+  near: 0.1
   test_path: nerfdataset/lot1/transforms_test.json
   train_path: nerfdataset/lot1/transforms_train.json
   val_path: nerfdataset/lot1/transforms_val.json
-  white_bkgd: true
+  white_bkgd: false
 dataset: lot1
+description: Experiment lot1 with specific settings
 evaluation:
-  max_val_images: 5
+  max_val_images: 10
   metrics:
   - psnr
   - ssim
   - lpips
-  save_comparisons: false
-  save_images: false
-experiment_name: lot1_4x3090
-mlflow_uri: http://0.0.0.0:8080
+  save_comparisons: true
+  save_images: true
+experiment_name: lot1_exp
+mlflow_uri: http://localhost:5001
 model:
-  N_importance: 256
-  N_samples: 128
+  N_importance: 128
+  N_samples: 64
   multires: 10
   multires_views: 4
   net_depth: 8
   net_depth_fine: 8
   net_width: 256
   net_width_fine: 256
-  pts_chunk: 16384
-  ray_chunk: 8192
+  pts_chunk: 4096
+  ray_chunk: 2048
   type: mipnerf
   use_embed: true
   use_hierarchical: true
   use_viewdirs: true
-  white_bkgd: true
+  white_bkgd: false
 system:
   benchmark: true
   deterministic: false
-  device: cuda
+  device: cpu
   precision: fp32
   seed: 42
 training:
-  batch_size: 16384
+  batch_size: 1024
   i_print: 100
-  i_testset: 50000
+  i_testset: 20000
   i_weights: 10000
   lr: 5e-4
   lr_decay_rate: 0.1
-  lr_decay_steps: 50000
-  lr_decay_warmup_step: 2000
-  lr_warmup_init: 1e-5
-  max_steps: 1000000
-  num_workers: 16
+  lr_decay_steps: 100000
+  max_steps: 200000
+  num_workers: 4
