@@ -1,0 +1,21 @@
+{
+  "experiment_name": "lot3",
+  "method_name": "mipnerf",
+  "checkpoint": "outputs/lot3/mipnerf/2025-12-06_191530/nerfstudio_models/step-000099999.ckpt",
+  "results": {
+    "psnr": 10.21307373046875,
+    "psnr_std": 1.6417183876037598,
+    "coarse_psnr": 9.937250137329102,
+    "coarse_psnr_std": 1.7445509433746338,
+    "fine_psnr": 10.21307373046875,
+    "fine_psnr_std": 1.6417183876037598,
+    "fine_ssim": 0.4142269492149353,
+    "fine_ssim_std": 0.08181510865688324,
+    "fine_lpips": 0.8300315141677856,
+    "fine_lpips_std": 0.054313935339450836,
+    "num_rays_per_sec": 11605.62890625,
+    "num_rays_per_sec_std": 24.3261775970459,
+    "fps": 0.00831113662570715,
+    "fps_std": 1.7420727090211585e-05
+  }
+}
